@@ -107,6 +107,16 @@ const WeatherDetail = ({ route }: any) => {
         )
     }
 
+    const renderItem2 = ({item, index} : any)=>{
+return(
+    <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginHorizontal: 30, }}>
+                            <Text style={{ fontFamily: 'Overpass-Regular', fontSize: 20, color: 'white' }}>Sep,13</Text>
+                            <Cloud name='cloud-sun' size={20} color='white' />
+                            <Text style={{ fontSize: 20, color: 'white' }}>21°</Text>
+                        </View>
+)
+
+    } 
 
 
     const navigation = useNavigation()
@@ -160,7 +170,7 @@ const WeatherDetail = ({ route }: any) => {
 
                     <View style={{ flex: 1 }} />
 
-                    <View style={{ height: 300, justifyContent: 'space-between' }}>
+                    {/* <View style={{ height: 300, justifyContent: 'space-between' }}>
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginHorizontal: 30, }}>
                             <Text style={{ fontFamily: 'Overpass-Regular', fontSize: 20, color: 'white' }}>Sep,13</Text>
                             <Cloud name='cloud-sun' size={20} color='white' />
@@ -186,7 +196,7 @@ const WeatherDetail = ({ route }: any) => {
                             <Cloud name='cloud-moon' size={20} color='white' />
                             <Text style={{ fontSize: 20, color: 'white' }}>21°</Text>
                         </View>
-                    </View>
+                    </View> */}
 
                     <View style={{ flex: 2 }} />
 
