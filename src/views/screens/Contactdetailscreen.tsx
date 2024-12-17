@@ -11,10 +11,10 @@ import Icon2 from 'react-native-vector-icons/MaterialCommunityIcons'
 import Icon3 from 'react-native-vector-icons/Feather'
 import Callhistory from '../../components/Callhistory'
 
-
+ 
 const Contactdetailscreen = ({ route }: any) => {
 
-   const { data, index } = route.params
+   const { data, index,  } = route.params
    console.log('DATA ====>', data)
    const navigation = useNavigation()
 
@@ -89,7 +89,11 @@ const Contactdetailscreen = ({ route }: any) => {
          <View style={styles.spaccer} />
 
          <View style={styles.contactpiccontainer}>
-            <Icon1 name="account-circle" size={150} color="grey" style={styles.Contactpic} />
+            {/* <Icon1 name="account-circle" size={150} color="grey" style={styles.Contactpic} /> */}
+            { data.selectedImage?   data.selectedImage  &&
+                           <Image style={{ height: 170, width: 170, borderRadius: 100, }} source={{ uri: data.selectedImage }} />:
+                        <Icon1 name="account-circle" size={170} color="grey" />
+                       }
 
             <View style={styles.Iconcontainer}>
                <TouchableOpacity onPress={() => deleteContact(index)}>

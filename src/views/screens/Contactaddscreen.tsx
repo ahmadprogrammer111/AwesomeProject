@@ -1,5 +1,5 @@
 
-import { StyleSheet, Text, View, TouchableOpacity, TextInput, Image, Alert } from 'react-native'
+import { StyleSheet, Text, View, TouchableOpacity, TextInput, Image, Alert, Button } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import Contactlistscreen from './Contactlistscreen'
@@ -7,27 +7,51 @@ import { useNavigation } from '@react-navigation/native'
 import CustomInput from '../../components/CustomInput'
 import Icon from 'react-native-vector-icons/Ionicons'
 import Icon2 from 'react-native-vector-icons/AntDesign'
+import { launchImageLibrary } from 'react-native-image-picker'
 
 
 const Contactaddscreen = () => {
+   const [selectedImage, setSelectedImage] = useState<any>(null)
 
+   const openImagePicker = () => {
+      const options = {
+         mediaType: 'photo',
+         includeBase64: false,
+         maxHeight: 2000,
+         maxWidth: 2000,
+      };
+
+
+      launchImageLibrary(options, (response: any) => {
+         if (response.didCancel) {
+            console.log('User cancelled image picker');
+         } else if (response.error) {
+            console.log('Image picker error: ', response.error);
+         } else {
+            let imageUri = response.uri || response.assets?.[0]?.uri;
+            setSelectedImage(imageUri);
+         }
+      });
+   };
+   
 
    const navigation = useNavigation()
-
    const [name, setName] = useState('')
    const [surname, setSurname] = useState('')
    const [phone, setPhone] = useState('')
    const [contacts, setContacts] = useState([])
 
+
    const savecontact = () => {
       if (name !== '' && phone !== '') {
-         const contactArray = [...contacts, { name, surname, phone }]
+         const contactArray = [...contacts, { name, surname, phone, selectedImage }]
          setContacts(contactArray as any)
          storeObjectValue(contactArray)
          setName('')
          setSurname('')
          setPhone('')
-         navigation.navigate('Contactlist' as never)
+         setSelectedImage(null)
+         navigation.navigate('Contactlistscreen' as never)
 
       }
       else {
@@ -83,8 +107,8 @@ const Contactaddscreen = () => {
             <View style={styles.imagecontainer}>
 
                <TouchableOpacity
-               onPress={()=> navigation.goBack()}
-               > 
+                  onPress={() => navigation.goBack()}
+               >
                   <Icon name='arrow-back' size={25} color='black' />
                </TouchableOpacity>
 
@@ -104,11 +128,19 @@ const Contactaddscreen = () => {
             <CustomInput value={surname} setValue={setSurname} placeholder="Enter Surname (Optional)" keyboardType='default' header='Surname' />
          </View>
          <View style={styles.spaccer} />
-         <View>         
-            <CustomInput value={phone} setValue={setPhone} placeholder="+998   _ _    _ _ _ _    _ _ _" keyboardType='phone-pad' header='Phone Number' /> 
+         <View>
+            <CustomInput value={phone} setValue={setPhone} placeholder="+998   _ _    _ _ _ _    _ _ _" keyboardType='phone-pad' header='Phone Number' />
          </View>
+  
 
-      
+
+         <Button title='Upload image from gallery' onPress={openImagePicker} />
+         {
+        selectedImage &&
+        <Image style={{height: 100, width: 100}} source={{uri: selectedImage}}/>
+      }
+
+
       </View>
    )
 }

@@ -14,7 +14,7 @@ import Icon3 from 'react-native-vector-icons/Feather'
 import Icon4 from 'react-native-vector-icons/AntDesign'
 import { TextInput } from 'react-native-gesture-handler'
 
- 
+
 
 
 const Contactlistscreen = () => {
@@ -35,6 +35,7 @@ const Contactlistscreen = () => {
          const storedobjectvalue = JSON.parse(jsonvalue as any)
          if (storedobjectvalue !== null) {
             setContacts(storedobjectvalue as any)
+            
          }
          console.log('Got stored value', storedobjectvalue)
       } catch (error) {
@@ -68,12 +69,17 @@ const Contactlistscreen = () => {
 
          <View style={styles.flatlistcontainer}>
             <TouchableOpacity
-               onPress={() => navigation.navigate('Contact_detail', { data: item ,index})}
+               onPress={() => navigation.navigate('Contactdetailscreen', { data: item, index,  })}
             >
                <View style={styles.flatlistmain}>
 
                   <View style={styles.flatlist}>
-                     <Icon1 name="account-circle" size={52} color="grey" />
+                  
+                       { item.selectedImage ?   item.selectedImage  &&
+                           <Image style={{ height: 45, width: 45, borderRadius: 25, }} source={{ uri: item.selectedImage }} />:
+                        <Icon1 name="account-circle" size={52} color="grey" />
+                       }
+
                      <View>
                         <Text style={styles.name}>
                            {exceedmaxlength(item.name, 12)}{' '}{exceedmaxlength(item.surname, 12)}
@@ -99,7 +105,7 @@ const Contactlistscreen = () => {
       )
    }
 
-// Readme VVVVVVV
+   // Readme VVVVVVV
    // Pass the date constant in the flatlist render function and then it will iterate that const array 
 
 
@@ -114,9 +120,9 @@ const Contactlistscreen = () => {
          </View>
    }
 
-// const [showsearch, setshowsearch] = useState(false)
-// const [text, settext] = useState('')
- 
+   // const [showsearch, setshowsearch] = useState(false)
+   // const [text, settext] = useState('')
+
 
    return (
 
@@ -124,13 +130,13 @@ const Contactlistscreen = () => {
          <View style={styles.Headercontainer}>
             <View style={styles.imagecontainer}>
 
-                       <View style={styles.headertextcontainer}>
+               <View style={styles.headertextcontainer}>
                   <Text style={styles.Headertextstyle}>Contacts</Text>
                </View>
             </View>
 
             <View style={styles.imagecontainer}>
-               <TouchableOpacity 
+               <TouchableOpacity
                // onPress={()=> setshowsearch(true)}
                >
                   <Icon name='search' size={25} color='black' style={styles.search} />
@@ -144,7 +150,7 @@ const Contactlistscreen = () => {
 
          <Emptylist_shower />
 
-         <TouchableOpacity style={styles.addcontactbutton} onPress={()=> navigation.navigate('NewContact')}>
+         <TouchableOpacity style={styles.addcontactbutton} onPress={() => navigation.navigate('Contactaddscreen')}>
             <Icon4 name='plus' size={22} color='white' />
          </TouchableOpacity>
       </View>
@@ -263,8 +269,8 @@ const styles = StyleSheet.create({
       shadowRadius: 10,
       shadowColor: 'black'
    },
-   searchtext:{
-backgroundColor: 'black'
+   searchtext: {
+      backgroundColor: 'black'
    },
 })
 

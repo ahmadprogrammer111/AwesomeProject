@@ -37,6 +37,7 @@ import Message14 from './views/screens/FurnitureScreens/Message14.tsx'
 import Account15 from './views/screens/FurnitureScreens/Account15.tsx'
 import WeatherHome from './views/screens/WeatherScreens/WeatherHome.tsx'
 import WeatherDetail from './views/screens/WeatherScreens/WeatherDetail.tsx'
+import ImagePicker from './views/screens/ImagePicker.tsx'
 
 
 
@@ -130,10 +131,13 @@ const App = () => {
 
    const StackNavigator = createNativeStackNavigator({
       screens: {
+         Contactlistscreen: Contactlistscreen,
 
+         Contactaddscreen: Contactaddscreen,
+         Contactdetailscreen: Contactdetailscreen
 
-         WeatherHome: WeatherHome,
-         WeatherDetail: WeatherDetail,
+         // WeatherHome: ImagePicker,
+         // WeatherDetail: WeatherDetail,
       },
       screenOptions: { headerShown: false }
    })
