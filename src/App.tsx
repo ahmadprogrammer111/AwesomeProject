@@ -132,12 +132,8 @@ const App = () => {
    const StackNavigator = createNativeStackNavigator({
       screens: {
          Contactlistscreen: Contactlistscreen,
-
          Contactaddscreen: Contactaddscreen,
          Contactdetailscreen: Contactdetailscreen
-
-         // WeatherHome: ImagePicker,
-         // WeatherDetail: WeatherDetail,
       },
       screenOptions: { headerShown: false }
    })
