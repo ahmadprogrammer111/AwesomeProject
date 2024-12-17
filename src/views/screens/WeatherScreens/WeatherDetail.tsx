@@ -17,12 +17,12 @@ const WeatherDetail = ({ route }: any) => {
     console.log('My data', data)
     console.log('my pos', position)
     const [weatherData, setWeatherData] = useState<any>([])
+    const [todaysWeatherData, setTodaysWeatherData] = useState<any>([])
 
     const [city, setCity] = useState('')
     const [Loading, setLoading] = useState(true)
     const [error, setError] = useState('')
     const [selectedItem, setSelectedItem] = useState<string | null>(null)
-
 
     console.log('city', city)
 
@@ -48,7 +48,7 @@ const WeatherDetail = ({ route }: any) => {
     )
 
 
-    const API_KEY = 'b297f53ea47e6377f655848ec36eb23d'
+    const API_KEY = '4aa4ab3e670c095aeea89b9d77ef3af0'
 
     const getstoreddata = async () => {
         setLoading(true)
@@ -62,44 +62,64 @@ const WeatherDetail = ({ route }: any) => {
             console.log('data=======>', Data)
             if (response.ok) {
                 setWeatherData(Data)
+                const slicedArray = Data.list.slice(0, 5)
+                setTodaysWeatherData(slicedArray)
                 setError('')
             } else {
                 // const errmsg = error || JSON.stringify(error)
                 setError(Data.message)
             } setLoading(false)
 
-
         } catch (error: any) {
-
-
             console.error('Error details:', error);
-
-
             Alert.alert('Error', error);
             setError(error);
-
         }
     }
 
-    // console.log('ispressed', selectedItem)
+    // // console.log('ispressed', selectedItem)
+
+    // const renderItem = ({ item, index }: any) => {
+
+    //     const date = new Date(item.dt_txt)
+    //     const time = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    //     return (
+
+    //         <Pressable style={[styles.flatlistmaincontainer, { backgroundColor: selectedItem === index ? '#88c4f4' : 'transparent', borderWidth: selectedItem === index ? 1 : 0, borderColor: '#FFFFFF' }]}
+    //             onPress={() => setSelectedItem(index)} >
+    //             <View style={styles.tabitem}>
+    //                 <Text >{Math.round(item.main.temp)}°C</Text>
+
+    //                 {item?.weather[0]?.icon ? <Image
+    //                     style={{ alignSelf: 'center' }}
+    //                     onError={(e) => console.log('Image Load Error:', e.nativeEvent.error)}
+    //                     height={60} width={60}
+    //                     source={{ uri: `https://openweathermap.org/img/wn/${item?.weather[0]?.icon}@4x.png` }} />
+    //                     : <Text style={styles.text}>Loading icon....</Text>
+    //                 }
+    //                 <Text>{time}</Text>
+    //             </View>
+    //         </Pressable>
+    //         //  </View>
+    //     )
+    // }
 
     const renderItem = ({ item, index }: any) => {
-        // console.log('date', item.dt_txt)
+
         const date = new Date(item.dt_txt)
         const time = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
         return (
-            
-            <Pressable style={[styles.flatlistmaincontainer, { backgroundColor: selectedItem === index ? '#88c4f4' : 'transparent', borderWidth: selectedItem === index ? 1 : 0, borderColor: '#FFFFFF' }]} 
-            onPress={() => setSelectedItem(index)} >
+            <Pressable style={[styles.flatlistmaincontainer, { backgroundColor: selectedItem === index ? '#88c4f4' : 'transparent', borderWidth: selectedItem === index ? 1 : 0, borderColor: '#FFFFFF' }]}
+                onPress={() => setSelectedItem(index)} >
                 <View style={styles.tabitem}>
-                    <Text >{item.main.temp}°C</Text>
+                    <Text >{Math.round(item.main.temp)}°C</Text>
                     {item?.weather[0]?.icon ? <Image
-                                style={{ alignSelf: 'center' }}
-                                onError={(e) => console.log('Image Load Error:', e.nativeEvent.error)}
-                                height={60} width={60}
-                                source={{ uri: `https://openweathermap.org/img/wn/${item?.weather[0]?.icon}@4x.png` }} />
-                                : <Text style={styles.text}>Loading icon....</Text>
-                            }
+                        style={{ alignSelf: 'center' }}
+                        onError={(e) => console.log('Image Load Error:', e.nativeEvent.error)}
+                        height={60} width={60}
+                        source={{ uri: `https://openweathermap.org/img/wn/${item?.weather[0]?.icon}@4x.png` }} />
+                        : <Text style={styles.text}>Loading icon....</Text>
+                    }
                     <Text>{time}</Text>
                 </View>
             </Pressable>
@@ -107,16 +127,32 @@ const WeatherDetail = ({ route }: any) => {
         )
     }
 
-    const renderItem2 = ({item, index} : any)=>{
-return(
-    <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginHorizontal: 30, }}>
-                            <Text style={{ fontFamily: 'Overpass-Regular', fontSize: 20, color: 'white' }}>Sep,13</Text>
-                            <Cloud name='cloud-sun' size={20} color='white' />
-                            <Text style={{ fontSize: 20, color: 'white' }}>21°</Text>
-                        </View>
-)
 
-    } 
+
+
+    const renderItem2 = ({ item, index }: any) => {
+        const date = new Date(item.dt_txt)
+        const time = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', })
+        return (
+
+
+            <View style={styles.flatlist2}>
+                {/* <View style={{  width: '20%',height: '80%', marginBottom: 30,backgroundColor:'black'}}> */}
+                <Text style={{ width: '20%', fontFamily: 'Overpass-Medium', fontSize: 20, color: 'white', textAlignVertical: 'center' }}>{time}</Text>
+                {/* </View> */}
+                {item?.weather[0]?.icon ? <Image
+                    style={{ alignSelf: 'center' }}
+                    onError={(e) => console.log('Image Load Error:', e.nativeEvent.error)}
+                    height={60} width={60}
+                    source={{ uri: `https://openweathermap.org/img/wn/${item?.weather[0]?.icon}@4x.png` }} />
+                    : <Text style={styles.text}>Loading icon....</Text>
+                }
+                {/* <Cloud name='cloud-sun' size={20} color='white' /> */}
+                <Text style={{ fontSize: 20, fontFamily: 'Overpass-Medium', color: 'white' }}>{Math.round(item.main.temp)}°C</Text>
+            </View>
+
+        )
+    }
 
 
     const navigation = useNavigation()
@@ -152,14 +188,13 @@ return(
 
                     <View style={{ height: 15 }} />
 
-                    <FlatList data={weatherData.list}
+
+                    <FlatList data={todaysWeatherData}
                         renderItem={renderItem as any}
                         horizontal={true}
                         style={styles.flatlist}
 
                     />
-
-
 
                     <View style={{ flex: 2, }} />
 
@@ -169,6 +204,13 @@ return(
                     </View>
 
                     <View style={{ flex: 1 }} />
+
+                    <FlatList data={weatherData.list}
+                        renderItem={renderItem2 as any}
+
+                        style={{ height: '35%' }}
+
+                    />
 
                     {/* <View style={{ height: 300, justifyContent: 'space-between' }}>
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginHorizontal: 30, }}>
@@ -226,11 +268,11 @@ const styles = StyleSheet.create({
         // backgroundColor:'red',
         paddingVertical: 0,
         alignItems: 'center',
-        paddingHorizontal: 8
+        paddingHorizontal: 5
         // width: '140%'
     },
     flatlistmaincontainer: {
-        marginRight: 10,
+        marginRight: 0,
         alignItems: 'center',
         justifyContent: 'center',
         borderRadius: 20,
@@ -244,10 +286,9 @@ const styles = StyleSheet.create({
     flatlist: {
         // backgroundColor: 'orange',
         height: '13%',
-        marginHorizontal: 25
+        marginHorizontal: 15
     },
     back: {
-
         fontFamily: 'Overpass-Regular',
         color: 'white',
         fontSize: 20,
@@ -263,4 +304,11 @@ const styles = StyleSheet.create({
         color: 'white',
         fontFamily: 'Overapass-Regular',
     },
+    flatlist2: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginHorizontal: 30,
+        // backgroundColor: 'red',
+        alignItems: 'center'
+    }
 })

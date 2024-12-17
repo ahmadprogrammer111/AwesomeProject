@@ -27,7 +27,7 @@ const WeatherHome = () => {
 
 
 
-    const API_KEY = 'b297f53ea47e6377f655848ec36eb23d'
+    const API_KEY = '4aa4ab3e670c095aeea89b9d77ef3af0'
 
 
 
@@ -155,7 +155,7 @@ const WeatherHome = () => {
                                     <TouchableOpacity>
                                         <Icon name='location' size={25} color='white' />
                                     </TouchableOpacity>
-                                    <Text style={{ color: 'white', fontFamily: 'Overpass-Regular', fontSize: 20, marginHorizontal: 20 }}>{showableCity}</Text>
+                                    <Text style={{ color: 'white', fontFamily: 'Overpass-Regular', fontSize: 20, marginHorizontal: 20 }}>{showableCity? showableCity: 'Rahim Yar'}</Text>
                                     <TouchableOpacity>
                                         <Icon2 name='chevron-small-down' size={20} color='white' />
                                     </TouchableOpacity>
