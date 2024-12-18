@@ -7,6 +7,8 @@ import { useNavigation } from '@react-navigation/native'
 import CustomInput from '../../components/CustomInput'
 import Icon from 'react-native-vector-icons/Ionicons'
 import Icon2 from 'react-native-vector-icons/AntDesign'
+import Icon3 from 'react-native-vector-icons/MaterialIcons'
+
 import { launchImageLibrary } from 'react-native-image-picker'
 
 
@@ -14,12 +16,14 @@ const Contactaddscreen = () => {
    const [selectedImage, setSelectedImage] = useState<any>(null)
 
    const openImagePicker = () => {
-      const options = {
+      const options: any = {
          mediaType: 'photo',
          includeBase64: false,
          maxHeight: 2000,
          maxWidth: 2000,
       };
+
+
 
 
       launchImageLibrary(options, (response: any) => {
@@ -33,7 +37,7 @@ const Contactaddscreen = () => {
          }
       });
    };
-   
+
 
    const navigation = useNavigation()
    const [name, setName] = useState('')
@@ -62,7 +66,6 @@ const Contactaddscreen = () => {
 
    useEffect(() => {
       getStoredObjectValue()
-
    }, [])
 
    const storeObjectValue = async (Contactlist: any) => {
@@ -89,12 +92,6 @@ const Contactaddscreen = () => {
    }
 
 
-
-
-
-
-
-
    return (
       <View style={styles.container}>
 
@@ -119,7 +116,13 @@ const Contactaddscreen = () => {
          </View>
 
          <View style={styles.spaccer} />
-
+         <TouchableOpacity onPress={openImagePicker} style={{marginRight: 20,}}>
+            <Icon name='image' color='black' size={25} style={{ alignSelf: 'flex-end' }} />
+         </TouchableOpacity>
+         {
+            selectedImage &&
+            <Image style={{ height: 100, width: 100, borderRadius: 50, alignSelf: 'center' }} source={{ uri: selectedImage }} />
+         }
          <View>
             <CustomInput value={name} setValue={setName} placeholder="Enter Name" keyboardType='default' header='Name' />
          </View>
@@ -131,14 +134,10 @@ const Contactaddscreen = () => {
          <View>
             <CustomInput value={phone} setValue={setPhone} placeholder="+998   _ _    _ _ _ _    _ _ _" keyboardType='phone-pad' header='Phone Number' />
          </View>
-  
 
 
-         <Button title='Upload image from gallery' onPress={openImagePicker} />
-         {
-        selectedImage &&
-        <Image style={{height: 100, width: 100}} source={{uri: selectedImage}}/>
-      }
+
+
 
 
       </View>

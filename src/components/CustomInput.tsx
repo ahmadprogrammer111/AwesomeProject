@@ -28,7 +28,7 @@ const styles = StyleSheet.create({
     name: {
         color: 'black',
         fontSize: 16,
-        fontFamily: 'poppins_extrabolditalic'
+        fontFamily: 'Roboto-Regular'
     },
     namecontainer: {
         backgroundColor: '#f2f3f4',

@@ -36,6 +36,7 @@ const Contactlistscreen = () => {
          if (storedobjectvalue !== null) {
             setContacts(storedobjectvalue as any)
             
+
          }
          console.log('Got stored value', storedobjectvalue)
       } catch (error) {
@@ -65,35 +66,50 @@ const Contactlistscreen = () => {
 
 
    const Showcontacts = ({ item, index }: any) => {
+
       return (
 
          <View style={styles.flatlistcontainer}>
             <TouchableOpacity
-               onPress={() => navigation.navigate('Contactdetailscreen', { data: item, index,  })}
+               onPress={() => navigation.navigate('Contactdetailscreen', { data: item, index, })}
             >
+
                <View style={styles.flatlistmain}>
 
                   <View style={styles.flatlist}>
-                  
-                       { item.selectedImage ?   item.selectedImage  &&
-                           <Image style={{ height: 45, width: 45, borderRadius: 25, }} source={{ uri: item.selectedImage }} />:
-                        <Icon1 name="account-circle" size={52} color="grey" />
-                       }
 
-                     <View>
+                     {item.selectedImage ?
+                        item.selectedImage &&
+                        <Image style={{ height: 48, width: 48, borderRadius: 25, marginLeft: 4 }} source={{ uri: item.selectedImage }} /> :
+                        <View >
+                           <Icon1 name="account-circle" size={56} color="grey"
+                              style={{
+                                 height: 52, width: 52,
+                                 // backgroundColor: 'red', 
+                              }}
+                           />
+                        </View>
+                     }
+
+
+                     <View style={{
+                        // backgroundColor: 'black', 
+                        marginLeft: 10,
+                        marginTop: item.selectedImage ? 2 : 7
+                     }}>
                         <Text style={styles.name}>
                            {exceedmaxlength(item.name, 12)}{' '}{exceedmaxlength(item.surname, 12)}
                         </Text>
-                        <Text style={styles.name}>
+                        <Text style={styles.phone}>
                            {exceedmaxlength(item.phone, 12)}
                         </Text>
-
-
                      </View>
                   </View>
 
                   <View style={styles.flatlist}>
-                     <Icon1 name="call" size={30} color="#4eab45" style={styles.phone} />
+                     <Icon1 name="call" size={30} color="#4eab45" style={styles.phoneicon} />
+
+                     {/* Emergency button */}
                      {/* <TouchableOpacity onPress={() => deleteContact(index)}>
                         <Icon2 name="delete" size={30} color="black" />
                      </TouchableOpacity> */}
@@ -214,23 +230,34 @@ const styles = StyleSheet.create({
    },
    flatlist: {
       flexDirection: 'row',
-      marginVertical: 6,
-      paddingVertical: 8,
+      marginVertical: 12,
+      paddingVertical: 0,
       paddingHorizontal: 0,
    },
    flatlistcontainer: {
+      // alignItems: 'center',
+      justifyContent: 'center',
       marginStart: 20,
       marginEnd: 20,
    },
    name: {
-      color: 'black',
+      color: '#000000',
       fontSize: 16,
+      fontFamily: 'Roboto-SemiBold',
+      fontWeight: '700'
+   },
+   phone: {
+      color: '#8B8B8B',
+      fontSize: 14,
+      fontFamily: 'Roboto-Regular',
+      fontWeight: '500'
+
    },
    image: {
       height: 60,
       width: 60,
    },
-   phone: {
+   phoneicon: {
       // height: 31,
       // width: 31,
       marginRight: 15,
@@ -263,11 +290,11 @@ const styles = StyleSheet.create({
       right: 20,
       height: 70,
       width: 70,
-      borderRadius: 70,
+      borderRadius: 35,
       backgroundColor: '#00B2FF',
       position: 'absolute',
-      shadowRadius: 10,
-      shadowColor: 'black'
+      // shadowRadius: 10,
+      // shadowColor: 'black'
    },
    searchtext: {
       backgroundColor: 'black'

@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native'
-import React, { useCallback } from 'react'
+import React, { useCallback, useEffect } from 'react'
 import { useFocusEffect, useNavigation } from '@react-navigation/native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useState } from 'react'
@@ -10,8 +10,9 @@ import Icon1 from 'react-native-vector-icons/MaterialIcons'
 import Icon2 from 'react-native-vector-icons/MaterialCommunityIcons'
 import Icon3 from 'react-native-vector-icons/Feather'
 import Callhistory from '../../components/Callhistory'
+import { launchImageLibrary } from 'react-native-image-picker'
 
- 
+
 const Contactdetailscreen = ({ route }: any) => {
 
    const { data, index,  } = route.params
@@ -24,7 +25,7 @@ const Contactdetailscreen = ({ route }: any) => {
    useFocusEffect(
       useCallback(() => {
       getStoredObjectValue()},
-        [],
+         [],
       )
    )
 
@@ -59,10 +60,8 @@ const Contactdetailscreen = ({ route }: any) => {
 
    return (
       <View style={styles.container}>
-
          <View style={styles.Headercontainer}>
             <View style={styles.imagecontainer}>
-
                <TouchableOpacity
                   onPress={() => navigation.goBack()}
                >
@@ -90,10 +89,15 @@ const Contactdetailscreen = ({ route }: any) => {
 
          <View style={styles.contactpiccontainer}>
             {/* <Icon1 name="account-circle" size={150} color="grey" style={styles.Contactpic} /> */}
-            { data.selectedImage?   data.selectedImage  &&
-                           <Image style={{ height: 170, width: 170, borderRadius: 100, }} source={{ uri: data.selectedImage }} />:
-                        <Icon1 name="account-circle" size={170} color="grey" />
-                       }
+
+            {data.selectedImage ? data.selectedImage &&
+               <Image style={{ height: 150, width: 150, borderRadius: 100, }} source={{ uri: data.selectedImage }} /> :
+
+               <TouchableOpacity>
+                  <Icon1 name="account-circle" size={160} color="grey" style={styles.Contactpic} />
+               </TouchableOpacity>
+            }
+
 
             <View style={styles.Iconcontainer}>
                <TouchableOpacity onPress={() => deleteContact(index)}>
@@ -109,7 +113,7 @@ const Contactdetailscreen = ({ route }: any) => {
          <View style={styles.spaccer2} />
 
 
-         <Text style={styles.contactname}>{data.name} {data.surname}</Text>
+         <Text style={[styles.contactname,]}>{data.name} {data.surname}</Text>
 
          <View style={styles.spaccer4} />
 
@@ -234,8 +238,9 @@ const styles = StyleSheet.create({
    },
    Contactpic: {
       // backgroundColor: 'pink',
-      height: 140,
-      width: 140,
+      height: 160,
+      width: 160,
+      marginRight: 0,
    },
    Iconcontainer: {
       position: 'absolute',

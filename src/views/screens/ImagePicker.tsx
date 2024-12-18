@@ -7,7 +7,7 @@ const ImagePicker = () => {
     const [selectedImage, setSelectedImage] = useState<any>(null)
 
     const openImagePicker = () => {
-        const options = {
+        const options : any = {
           mediaType: 'photo',
           includeBase64: false,
           maxHeight: 2000,
@@ -27,7 +27,7 @@ const ImagePicker = () => {
       };
 
        const handleCameraLaunch = () => {
-        const options = {
+        const options: any = {
           mediaType: 'photo',
           includeBase64: false,
           maxHeight: 2000,

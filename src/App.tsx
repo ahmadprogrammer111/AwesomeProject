@@ -133,10 +133,12 @@ const App = () => {
       screens: {
          Contactlistscreen: Contactlistscreen,
          Contactaddscreen: Contactaddscreen,
+  
          Contactdetailscreen: Contactdetailscreen
-      },
+      }, 
       screenOptions: { headerShown: false }
    })
+
 
 
    const Navigation = createStaticNavigation(StackNavigator)
