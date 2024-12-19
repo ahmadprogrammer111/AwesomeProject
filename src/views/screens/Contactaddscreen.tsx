@@ -1,19 +1,28 @@
 
 import { StyleSheet, Text, View, TouchableOpacity, TextInput, Image, Alert, Button } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import Contactlistscreen from './Contactlistscreen'
-import { useNavigation } from '@react-navigation/native'
+import { useFocusEffect, useNavigation } from '@react-navigation/native'
 import CustomInput from '../../components/CustomInput'
 import Icon from 'react-native-vector-icons/Ionicons'
 import Icon2 from 'react-native-vector-icons/AntDesign'
-import Icon3 from 'react-native-vector-icons/MaterialIcons'
+import Icon3 from 'react-native-vector-icons/MaterialCommunityIcons'
+import Icon4 from 'react-native-vector-icons/MaterialIcons'
+
 
 import { launchImageLibrary } from 'react-native-image-picker'
 
 
-const Contactaddscreen = () => {
-   const [selectedImage, setSelectedImage] = useState<any>(null)
+const Contactaddscreen = ({ route }: any) => {
+   const { data, index } = route.params || {}
+   console.log('data', data)
+   console.log('index:===>', index)
+
+
+   // console.log('Contact info', data)
+
+
 
    const openImagePicker = () => {
       const options: any = {
@@ -22,9 +31,6 @@ const Contactaddscreen = () => {
          maxHeight: 2000,
          maxWidth: 2000,
       };
-
-
-
 
       launchImageLibrary(options, (response: any) => {
          if (response.didCancel) {
@@ -40,14 +46,27 @@ const Contactaddscreen = () => {
 
 
    const navigation = useNavigation()
-   const [name, setName] = useState('')
-   const [surname, setSurname] = useState('')
-   const [phone, setPhone] = useState('')
+   const [name, setName] = useState(data?.name ? data.name : '')
+   const [surname, setSurname] = useState(data?.surname ? data.surname : '')
+   const [phone, setPhone] = useState(data?.phone ? data.phone : '')
+   const [selectedImage, setSelectedImage] = useState<any>(data?.selectedImage ? data.selectedImage : null)
+
    const [contacts, setContacts] = useState([])
 
+   console.log('Before update:', contacts);
+
+   useFocusEffect(
+      useCallback(
+         () => {
+            getStoredObjectValue()
+         },
+         [],
+      )
+   )
 
    const savecontact = () => {
       if (name !== '' && phone !== '') {
+         console.log('My contacts', contacts)
          const contactArray = [...contacts, { name, surname, phone, selectedImage }]
          setContacts(contactArray as any)
          storeObjectValue(contactArray)
@@ -63,10 +82,23 @@ const Contactaddscreen = () => {
       }
    }
 
+   const updateContact = () => {
 
-   useEffect(() => {
-      getStoredObjectValue()
-   }, [])
+      const oldContactslist = [...contacts] as any
+      oldContactslist[index] = { name, surname, phone, selectedImage }
+      console.log('Updating contact at index:', index);
+      storeObjectValue(oldContactslist)
+      navigation.navigate('Contactlistscreen' as never)
+
+   }
+
+
+
+
+   console.log('New contact data:', { name, surname, phone, selectedImage });
+   // useEffect(() => {
+   //    getStoredObjectValue( )
+   // }, [])
 
    const storeObjectValue = async (Contactlist: any) => {
       try {
@@ -109,30 +141,44 @@ const Contactaddscreen = () => {
                   <Icon name='arrow-back' size={25} color='black' />
                </TouchableOpacity>
 
-               <TouchableOpacity onPress={savecontact}>
+               <TouchableOpacity onPress={index !== undefined && index !== null ? updateContact : savecontact}>
                   <Icon2 name='check' size={25} color='black' />
                </TouchableOpacity>
             </View>
          </View>
 
          <View style={styles.spaccer} />
-         <TouchableOpacity onPress={openImagePicker} style={{marginRight: 20,}}>
-            <Icon name='image' color='black' size={25} style={{ alignSelf: 'flex-end' }} />
-         </TouchableOpacity>
+
+
+
+
          {
-            selectedImage &&
-            <Image style={{ height: 100, width: 100, borderRadius: 50, alignSelf: 'center' }} source={{ uri: selectedImage }} />
+            // data.contactphoto ? <Image style={styles.Contactpic} source={{ uri: data.contactphoto }} />
+            // : 
+            selectedImage ?
+               selectedImage &&
+               <Image style={styles.Contactpic} source={{ uri: selectedImage }} />
+               : <Icon4 name="account-circle" size={100} color="grey" style={styles.contactpic2} />
          }
+         <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
+            <TouchableOpacity onPress={openImagePicker} style={{ marginRight: 10, }}>
+               <Icon3 name='image-edit' color='black' size={25} style={{ alignSelf: 'flex-end' }} />
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={() => setSelectedImage(null)} style={{ marginRight: 20, }}>
+               <Icon3 name='file-image-remove' color='black' size={25} style={{ alignSelf: 'flex-end' }} />
+            </TouchableOpacity>
+         </View>
          <View>
-            <CustomInput value={name} setValue={setName} placeholder="Enter Name" keyboardType='default' header='Name' />
+            <CustomInput value={name} setValue={setName} placeholder="Enter Name" keyboardType='default' header='Name' maxlength={12} />
          </View>
          <View style={styles.spaccer} />
          <View>
-            <CustomInput value={surname} setValue={setSurname} placeholder="Enter Surname (Optional)" keyboardType='default' header='Surname' />
+            <CustomInput value={surname} setValue={setSurname} placeholder="Enter Surname (Optional)" keyboardType='default' header='Surname' maxlength={12} />
          </View>
          <View style={styles.spaccer} />
          <View>
-            <CustomInput value={phone} setValue={setPhone} placeholder="+998   _ _    _ _ _ _    _ _ _" keyboardType='phone-pad' header='Phone Number' />
+            <CustomInput value={phone} setValue={setPhone} placeholder="+998   _ _    _ _ _ _    _ _ _" keyboardType='phone-pad' header='Phone Number' maxlength={12} />
          </View>
 
 
@@ -233,6 +279,24 @@ const styles = StyleSheet.create({
    flatlistcontainer: {
       marginStart: 20,
       marginEnd: 20,
+   },
+   Contactpic: {
+      // // backgroundColor: 'pink',
+      // height: 160,
+      // width: 160,
+      // marginRight: 0,
+      height: 100,
+      width: 100,
+      borderRadius: 50,
+      alignSelf: 'center'
+   },
+   contactpic2: {
+      // backgroundColor: 'pink',
+      height: 100,
+      width: 100,
+      borderRadius: 80,
+      marginRight: 0,
+      alignSelf: 'center',
    }
 
 })

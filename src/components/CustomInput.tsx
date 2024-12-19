@@ -4,7 +4,7 @@ import React from 'react'
 
 
 const CustomInput = (props: any) => {
-    const { value, setValue, placeholder, keyboardType, header } = props
+    const { value, setValue, placeholder, keyboardType, header,maxlength } = props
     return (
         <View>
             <Text style={{ color: 'black', left: 25, fontSize: 16, }}>{header} </Text>
@@ -15,7 +15,10 @@ const CustomInput = (props: any) => {
                     onChangeText={setValue}
                     placeholder={placeholder}
                     placeholderTextColor={'grey'}
-                    keyboardType={keyboardType} />
+                    keyboardType={keyboardType} 
+                    maxLength={maxlength}
+                    />
+                    
 
             </View>
         </View>

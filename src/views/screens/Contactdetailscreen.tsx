@@ -15,16 +15,20 @@ import { launchImageLibrary } from 'react-native-image-picker'
 
 const Contactdetailscreen = ({ route }: any) => {
 
-   const { data, index,  } = route.params
+
+
+   const { data, index, } = route.params
    console.log('DATA ====>', data)
-   const navigation = useNavigation()
+
+   const navigation = useNavigation<any>()
 
    const [contacts, setContacts] = useState([])
 
 
    useFocusEffect(
       useCallback(() => {
-      getStoredObjectValue()},
+         getStoredObjectValue()
+      },
          [],
       )
    )
@@ -104,7 +108,16 @@ const Contactdetailscreen = ({ route }: any) => {
                   <Icon2 name="delete" size={35} color="black" style={styles.delete} />
                </TouchableOpacity>
 
-               <TouchableOpacity>
+               <TouchableOpacity onPress={() =>
+                  navigation.navigate('Contactaddscreen', {
+                     data: data,
+                     // name: data.name,
+                     // surname: data.surname,
+                     // phone: data.phone,
+                     // contactphoto: data.selectedImage,
+                     index: index
+                  })
+               }>
                   <Icon1 name="edit" size={35} color="black" style={styles.delete} />
                </TouchableOpacity>
             </View>

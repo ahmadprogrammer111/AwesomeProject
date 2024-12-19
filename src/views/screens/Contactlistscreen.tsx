@@ -60,7 +60,7 @@ const Contactlistscreen = () => {
 
 
    const exceedmaxlength = (text: string, maxlength: number) => {
-      return text.length > maxlength ? text.slice(0, maxlength) + '...' : text
+      return text?.length > maxlength ? text.slice(0, maxlength) + '...' : text
    }
 
 
@@ -78,9 +78,9 @@ const Contactlistscreen = () => {
 
                   <View style={styles.flatlist}>
 
-                     {item.selectedImage ?
-                        item.selectedImage &&
-                        <Image style={{ height: 48, width: 48, borderRadius: 25, marginLeft: 4 }} source={{ uri: item.selectedImage }} /> :
+                     {item?.selectedImage ?
+                        item?.selectedImage &&
+                        <Image style={{ height: 48, width: 48, borderRadius: 25, marginLeft: 4 }} source={{ uri: item?.selectedImage }} /> :
                         <View >
                            <Icon1 name="account-circle" size={56} color="grey"
                               style={{
@@ -95,13 +95,13 @@ const Contactlistscreen = () => {
                      <View style={{
                         // backgroundColor: 'black', 
                         marginLeft: 10,
-                        marginTop: item.selectedImage ? 2 : 7
+                        marginTop: item?.selectedImage ? 2 : 7
                      }}>
                         <Text style={styles.name}>
-                           {exceedmaxlength(item.name, 12)}{' '}{exceedmaxlength(item.surname, 12)}
+                           {exceedmaxlength(item?.name, 12)}{' '}{exceedmaxlength(item?.surname, 12)}
                         </Text>
                         <Text style={styles.phone}>
-                           {exceedmaxlength(item.phone, 12)}
+                           {exceedmaxlength(item?.phone, 12)}
                         </Text>
                      </View>
                   </View>
@@ -126,7 +126,7 @@ const Contactlistscreen = () => {
 
 
    const Emptylist_shower = () => {
-      return contacts.length !== 0 ? <FlatList
+      return contacts?.length !== 0 ? <FlatList
          data={contacts}
          renderItem={Showcontacts}
       /> :
