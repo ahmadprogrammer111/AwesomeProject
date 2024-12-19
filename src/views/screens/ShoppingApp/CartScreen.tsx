@@ -8,9 +8,9 @@ const CartScreen = () => {
       {/* Header( including avatar may cart text and back ) */}
 
       <View style={styles.header}>
-        <Image style={{ width: 47, height: 47, }} source={require('../../assets/images/Ellipse_4.png')} />
+        <Image style={{ width: 47, height: 47, }} source={require('../../../assets/images/Ellipse_4.png')} />
         <Text style={{ color: 'black', fontSize: 24, fontWeight: '700' }}>My Cart</Text>
-        <Image style={{ width: 50, height: 47, }} source={require('../../assets/images/5.png')} />
+        <Image style={{ width: 50, height: 47, }} source={require('../../../assets/images/5.png')} />
       </View>
 
 
@@ -19,9 +19,9 @@ const CartScreen = () => {
         {/* Image and name of the text and delete icon*/}
 
         <View style={styles.imageandtext}>
-          <Image style={{ width: 120, height: 170, }} source={require('../../assets/images/14.png')} />
+          <Image style={{ width: 120, height: 170, }} source={require('../../../assets/images/14.png')} />
           <Text style={{ color: 'black', fontSize: 13, fontWeight: '700', marginTop: 7, left: -4 }}>Striped Green Dress</Text>
-          <Image style={{ marginTop: 9, }} source={require('../../assets/images/16.png')} />
+          <Image style={{ marginTop: 9, }} source={require('../../../assets/images/16.png')} />
         </View>
 
         {/* price */}
@@ -33,17 +33,17 @@ const CartScreen = () => {
         {/* Size and color */}
 
         <View style={styles.sizes}>
-          <Image style={{ width: 37, height: 37, marginRight: 15, }} source={require('../../assets/images/Ellipse_14.png')} />
-          <Image style={{ width: 37, height: 37, }} source={require('../../assets/images/Ellipse_12.png')} />
+          <Image style={{ width: 37, height: 37, marginRight: 15, }} source={require('../../../assets/images/Ellipse_14.png')} />
+          <Image style={{ width: 37, height: 37, }} source={require('../../../assets/images/Ellipse_12.png')} />
         </View>
       </View>
 
       <View>
         {/* Image and name of the text and delete icon*/}
         <View style={styles.imageandtext}>
-          <Image style={{ width: 120, height: 170, marginTop: -10, }} source={require('../../assets/images/15.png')} />
+          <Image style={{ width: 120, height: 170, marginTop: -10, }} source={require('../../../assets/images/15.png')} />
           <Text style={{ color: 'black', fontSize: 13, fontWeight: '700', marginTop: -5, left: -7 }}>Striped Pink Dress</Text>
-          <Image style={{ marginTop: 0, }} source={require('../../assets/images/16.png')} />
+          <Image style={{ marginTop: 0, }} source={require('../../../assets/images/16.png')} />
         </View>
 
         {/* price */}
@@ -55,8 +55,8 @@ const CartScreen = () => {
         {/* Size and color */}
 
         <View style={styles.sizes2}>
-          <Image style={{ width: 37, height: 37, marginRight: 15, }} source={require('../../assets/images/Ellipse_11.png')} />
-          <Image style={{ width: 37, height: 37, }} source={require('../../assets/images/Ellipse_13.png')} />
+          <Image style={{ width: 37, height: 37, marginRight: 15, }} source={require('../../../assets/images/Ellipse_11.png')} />
+          <Image style={{ width: 37, height: 37, }} source={require('../../../assets/images/Ellipse_13.png')} />
         </View>
       </View>
 
@@ -87,13 +87,13 @@ const CartScreen = () => {
 
       <View style={styles.footer}>
         {/* Home Icon */}
-        <Image style={styles.iconcontainer} source={require('../../assets/images/Vector2.png')} />
+        <Image style={styles.iconcontainer} source={require('../../../assets/images/Vector2.png')} />
         {/* Menu Icon */}
-        <Image style={styles.iconcontainer} source={require('../../assets/images/9.png')} />
+        <Image style={styles.iconcontainer} source={require('../../../assets/images/9.png')} />
         {/* Cart Icon */}
-        <Image style={styles.iconcontainer} source={require('../../assets/images/17.png')} />
+        <Image style={styles.iconcontainer} source={require('../../../assets/images/17.png')} />
         {/*Person Icon */}
-        <Image style={styles.iconcontainer} source={require('../../assets/images/11.png')} />
+        <Image style={styles.iconcontainer} source={require('../../../assets/images/11.png')} />
       </View>
 
 

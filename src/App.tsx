@@ -1,8 +1,8 @@
 import { View } from 'react-native'
 import React from 'react'
-import Contactaddscreen from './views/screens/Contactaddscreen'
-import Contactlistscreen from './views/screens/Contactlistscreen'
-import Contactdetailscreen from './views/screens/Contactdetailscreen'
+import Contactaddscreen from './views/screens/ContactScreens/Contactaddscreen'
+import Contactlistscreen from './views/screens/ContactScreens/Contactlistscreen'
+import Contactdetailscreen from './views/screens/ContactScreens/Contactdetailscreen'
 
 import Splash_screen01 from './views/screens/FurnitureScreens/Splash_screen01'
 import OnBoarding02 from './views/screens/FurnitureScreens/OnBoarding02'
@@ -18,6 +18,14 @@ import Icon from 'react-native-vector-icons/Octicons.js'
 import Icon2 from 'react-native-vector-icons/MaterialCommunityIcons.js'
 import Icon3 from 'react-native-vector-icons/Fontisto.js'
 import Icon4 from 'react-native-vector-icons/MaterialIcons.js'
+import Icon5 from 'react-native-vector-icons/Entypo.js'
+import Icon6 from 'react-native-vector-icons/Foundation.js'
+import Icon7 from 'react-native-vector-icons/Ionicons.js'
+
+
+
+
+
 
 
 import { createStaticNavigation } from '@react-navigation/native'
@@ -30,14 +38,16 @@ import Home08 from './views/screens/FurnitureScreens/Home08'
 import Search09 from './views/screens/FurnitureScreens/Search09.tsx'
 import Product010 from './views/screens/FurnitureScreens/Product010.tsx'
 import Productdetailscreen11 from './views/screens/FurnitureScreens/Productdetailscreen11.tsx'
-import ProductDetailScreen from './views/screens/ProductDetailScreen.tsx'
+import ProductDetailScreen from './views/screens//ShoppingApp/HomeScreen.tsx'
 import Cart12 from './views/screens/FurnitureScreens/Cart12.tsx'
 import CheckOut13 from './views/screens/FurnitureScreens/CheckOut13.tsx'
 import Message14 from './views/screens/FurnitureScreens/Message14.tsx'
 import Account15 from './views/screens/FurnitureScreens/Account15.tsx'
 import WeatherHome from './views/screens/WeatherScreens/WeatherHome.tsx'
 import WeatherDetail from './views/screens/WeatherScreens/WeatherDetail.tsx'
-import ImagePicker from './views/screens/ImagePicker.tsx'
+
+import HomeScreen from './views/screens//ShoppingApp/CartScreen.tsx'
+import CartScreen from './views/screens//ShoppingApp/ProductDetailScreen.tsx'
 
 
 
@@ -47,7 +57,30 @@ import ImagePicker from './views/screens/ImagePicker.tsx'
 const App = () => {
 
 
+   const BottomNavigator = createBottomTabNavigator({
+      screens: {
+         HomeScreen: {
+            screen: HomeScreen,
+            options: {
+               tabBarIcon: () => <Icon6 name='home' size={35} color='#959292' />
+            }
+         },
+         ProductDetailScreen: {
+            screen: ProductDetailScreen,
+            options: {
+               tabBarIcon: () => <Icon5 name='menu' size={35} color='#959292' />
+            }
+         },
+         CartScreen: {
+            screen: CartScreen,
+            options: {
+               tabBarIcon: () => <Icon7 name='cart-sharp' size={35} color='#959292' />
 
+            }
+         }
+      },
+      screenOptions: { headerShown: false, tabBarShowLabel: false }
+   })
 
    // const BottomNavigator = createBottomTabNavigator({
 
@@ -69,7 +102,7 @@ const App = () => {
    //       },
    //    },
    //    screenOptions: { tabBarActiveTintColor: 'black', headerShown: false, tabBarShowLabel: false,  },
-   
+
    // })
 
 
@@ -123,25 +156,25 @@ const App = () => {
    //          screen: Logsignup03, options: { headerShown: false }
    //       },
 
-         
+
    //    }
    // })
 
 
 
-   const StackNavigator = createNativeStackNavigator({
-      screens: {
-         Contactlistscreen: Contactlistscreen,
-         Contactaddscreen: Contactaddscreen,
-  
-         Contactdetailscreen: Contactdetailscreen
-      }, 
-      screenOptions: { headerShown: false }
-   })
+   // const StackNavigator = createNativeStackNavigator({
+   //    screens: {
+   //       Contactlistscreen: Contactlistscreen,
+   //       Contactaddscreen: Contactaddscreen,
+
+   //       Contactdetailscreen: Contactdetailscreen
+   //    }, 
+   //    screenOptions: { headerShown: false }
+   // })
 
 
 
-   const Navigation = createStaticNavigation(StackNavigator)
+   const Navigation = createStaticNavigation(BottomNavigator)
 
    return (
       <Navigation />
