@@ -23,12 +23,7 @@ import Icon6 from 'react-native-vector-icons/Foundation.js'
 import Icon7 from 'react-native-vector-icons/Ionicons.js'
 
 
-
-
-
-
-
-import { createStaticNavigation } from '@react-navigation/native'
+import { createStaticNavigation, NavigationContainer } from '@react-navigation/native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { createDrawerNavigator, DrawerItem } from '@react-navigation/drawer'
@@ -38,7 +33,7 @@ import Home08 from './views/screens/FurnitureScreens/Home08'
 import Search09 from './views/screens/FurnitureScreens/Search09.tsx'
 import Product010 from './views/screens/FurnitureScreens/Product010.tsx'
 import Productdetailscreen11 from './views/screens/FurnitureScreens/Productdetailscreen11.tsx'
-import ProductDetailScreen from './views/screens//ShoppingApp/HomeScreen.tsx'
+import ProductDetailScreen from './views/screens/ShoppingApp/ProductDetailScreen.tsx'
 import Cart12 from './views/screens/FurnitureScreens/Cart12.tsx'
 import CheckOut13 from './views/screens/FurnitureScreens/CheckOut13.tsx'
 import Message14 from './views/screens/FurnitureScreens/Message14.tsx'
@@ -46,8 +41,10 @@ import Account15 from './views/screens/FurnitureScreens/Account15.tsx'
 import WeatherHome from './views/screens/WeatherScreens/WeatherHome.tsx'
 import WeatherDetail from './views/screens/WeatherScreens/WeatherDetail.tsx'
 
-import HomeScreen from './views/screens//ShoppingApp/CartScreen.tsx'
-import CartScreen from './views/screens//ShoppingApp/ProductDetailScreen.tsx'
+import HomeScreen from './views/screens/ShoppingApp/HomeScreen.tsx'
+import CartScreen from './views/screens/ShoppingApp/CartScreen.tsx'
+import { Provider, useSelector } from 'react-redux'
+import store from './redux/store.tsx'
 
 
 
@@ -56,31 +53,44 @@ import CartScreen from './views/screens//ShoppingApp/ProductDetailScreen.tsx'
 
 const App = () => {
 
+   // const cartItems = useSelector((state: any) => state.cart.items)
 
-   const BottomNavigator = createBottomTabNavigator({
+   // const cartCount = cartItems.reduce((total: number, item: any) => {
+   //    total + item.quantity
+   // }, 0)
+
+   
+   const bottomNavigator = createBottomTabNavigator({
+
       screens: {
          HomeScreen: {
             screen: HomeScreen,
             options: {
-               tabBarIcon: () => <Icon6 name='home' size={35} color='#959292' />
+               tabBarIcon: ({ color }) => <Icon6 name='home' size={35} color={color} style={{ height: '120%' }} />
             }
          },
          ProductDetailScreen: {
             screen: ProductDetailScreen,
             options: {
-               tabBarIcon: () => <Icon5 name='menu' size={35} color='#959292' />
+
+               tabBarIcon: ({ color }) => <Icon5 name='menu' size={35} color={color} style={{ height: '120%' }} />
             }
          },
          CartScreen: {
             screen: CartScreen,
             options: {
-               tabBarIcon: () => <Icon7 name='cart-sharp' size={35} color='#959292' />
 
+               tabBarIcon: ({ color }) => <Icon7 name='cart-sharp' size={35} color={color} style={{ height: '120%' }} />,
             }
          }
       },
-      screenOptions: { headerShown: false, tabBarShowLabel: false }
+      screenOptions: {
+         headerShown: false, tabBarShowLabel: false, tabBarActiveTintColor: '#ED6767', tabBarStyle: {
+            paddingTop: 3
+         }
+      }
    })
+
 
    // const BottomNavigator = createBottomTabNavigator({
 
@@ -174,10 +184,12 @@ const App = () => {
 
 
 
-   const Navigation = createStaticNavigation(BottomNavigator)
+   const Navigation = createStaticNavigation(bottomNavigator)
 
    return (
-      <Navigation />
+      <Provider store={store}>
+         <Navigation />
+      </Provider>
    )
 }
 
@@ -185,9 +197,3 @@ export default App
 
 
 
-{/* <View style={styles.container}>
-      {/* <PracticeScreen/> */}
-{/* <Contactdetailscreen/> */ }
-{/* <Contactaddscreen /> */ }
-{/* <Contactlistscreen/> */ }
-// </View> */}

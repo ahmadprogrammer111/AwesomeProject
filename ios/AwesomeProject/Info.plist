@@ -67,6 +67,16 @@
 		<string>Poppins-ThinItalic.ttf</string>
 		<string>poppins_bold.ttf</string>
 		<string>poppins_extrabolditalic.ttf</string>
+		<string>Inter_18pt-Medium.ttf</string>
+		<string>Inter_18pt-Regular.ttf</string>
+		<string>Inter_18pt-SemiBold.ttf</string>
+		<string>Inter_24pt-Medium.ttf</string>
+		<string>Inter_24pt-Regular.ttf</string>
+		<string>Inter_24pt-SemiBold.ttf</string>
+		<string>Overpass-Bold.ttf</string>
+		<string>Overpass-Medium.ttf</string>
+		<string>Overpass-Regular.ttf</string>
+		<string>PlusJakartaSans-Regular.ttf</string>
 	</array>
 </dict>
 </plist>
