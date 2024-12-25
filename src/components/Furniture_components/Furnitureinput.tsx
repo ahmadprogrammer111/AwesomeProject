@@ -3,16 +3,16 @@ import React from 'react'
 import { useState } from 'react'
 
 const Furnitureinput = (Props: any) => {
-    const { name, placeholder } = Props
-    const [Name, setName] = useState('')
+    const { name, placeholder, text, onChangeText } = Props
+    // const [Name, setName] = useState('')
 
     return (
         <View style={styles.maininputcontainer}>
 
-
             <Text style={styles.header}>{name}</Text>
             <View style={styles.textinputcontainer}>
-                <TextInput value={Name} onChangeText={setName} style={styles.textinput} placeholder={placeholder} placeholderTextColor='#838383' />
+                <TextInput value={text} onChangeText={onChangeText} 
+                style={styles.textinput} placeholder={placeholder} placeholderTextColor='#838383' />
             </View>
             
         </View>

@@ -11,6 +11,7 @@ import Icon2 from 'react-native-vector-icons/Ionicons'
 const cartScreen = () => {
   const dispatch = useDispatch()
   const cartItems = useSelector((state: any) => state.cart.items)
+  
   const navigation = useNavigation()
 
   const total = cartItems.reduce((sum: any, item: any) =>

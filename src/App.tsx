@@ -45,7 +45,10 @@ import HomeScreen from './views/screens/ShoppingApp/HomeScreen.tsx'
 import CartScreen from './views/screens/ShoppingApp/CartScreen.tsx'
 import { Provider, useSelector } from 'react-redux'
 import store from './redux/store.tsx'
-// import bottomNavigator from './components/navigation.tsx'
+import Contactdetailscreen2 from './views/screens/ContactScreens2/Contactdetailscreen2.tsx'
+import Contactaddscreen2 from './views/screens/ContactScreens2/Contactaddscreen2.tsx'
+import Contactlistscreen2 from './views/screens/ContactScreens2/Contactlistscreen2.tsx'
+
 
 
 
@@ -85,101 +88,102 @@ const App = () => {
    // })
 
 
+   // const BottomNavigator = createBottomTabNavigator({
 
-   const BottomNavigator = createBottomTabNavigator({
+   //    screens: {
+   //       Home: {
+   //          screen: Home08, options: { tabBarIcon: ({ color }) => <Icon name='home' size={30} color={color} /> }
+   //       },
+   //       Product010: {
+   //          screen: Product010, options: { tabBarIcon: ({ color }) => <Icon2 name='bookshelf' size={30} color={color} /> }
+   //       },
+   //       Search09: {
+   //          screen: Search09, options: { tabBarIcon: ({ color }) => <Icon3 name='bookmark' size={25} color={color} /> }
+   //       },
+   //       Message14: {
+   //          screen: Message14, options: { tabBarIcon: ({ color }) => <Icon4 name='chat-bubble-outline' size={30} color={color} /> }
+   //       },
+   //       Account15: {
+   //          screen: Account15, options: { tabBarIcon: ({ color }) => <Icon2 name='account' size={30} color={color} /> }
+   //       },
+   //    },
+   //    screenOptions: {
+   //       tabBarActiveTintColor: 'black', headerShown: false, tabBarShowLabel: false, tabBarStyle: {
+   //          height: '8%',
+   //          paddingTop: 10
+   //          // alignItems: 'center',
+   //          // justifyContent: 'center'
+   //       }
+   //    },
 
-      screens: {
-         Home: {
-            screen: Home08, options: { tabBarIcon: ({ color }) => <Icon name='home' size={30} color={color} /> }
-         },
-         Product010: {
-            screen: Product010, options: { tabBarIcon: ({ color }) => <Icon2 name='bookshelf' size={30} color={color} /> }
-         },
-         Search09: {
-            screen: Search09, options: { tabBarIcon: ({ color }) => <Icon3 name='bookmark' size={25} color={color}  /> }
-         },
-        Message14: {
-            screen: Message14, options: { tabBarIcon: ({ color }) => <Icon4 name='chat-bubble-outline' size={30} color={color}  /> }
-         },
-         Account15: {
-            screen: Account15, options: { tabBarIcon: ({ color }) => <Icon2 name='account' size={30} color={color}  /> }
-         },
-      },
-      screenOptions: { tabBarActiveTintColor: 'black', headerShown: false, tabBarShowLabel: false, tabBarStyle :{
-height:'8%' ,
-paddingTop: 10
-// alignItems: 'center',
-// justifyContent: 'center'
-      } },
-
-   })
-
-
-
+   // })
 
 
 
-   const StackNavigator = createNativeStackNavigator({
-
-      screens: {
-         Splash_screen01: {
-            screen: Splash_screen01, options: { headerShown: false }
-         },
-         OnBoarding02: {
-            screen: OnBoarding02, options: { headerShown: false }
-         },
-         Account15: {
-            screen: Account15, options: { headerShown: false }
-         },
-         Message14: {
-            screen: Message14, options: { headerShown: false }
-         },
-         CheckOut13: {
-            screen: CheckOut13, options: { headerShown: false }
-         },
-         Cart12: {
-            screen: Cart12, options: { headerShown: false }
-         },
-         Productdetailscreen11: {
-            screen: Productdetailscreen11, options: { headerShown: false }
-         },
-         Search09: {
-            screen: Search09, options: { headerShown: false }
-         },
-         Home08: {
-            screen:BottomNavigator, options: { headerShown: false }
-         },
-         VerifyOtp07: {
-            screen: VerifyOtp07, options: { headerShown: false }
-         },
-         ForgotPassword06: {
-            screen: ForgotPassword06, options: { headerShown: false }
-         },
-         Signup05: {
-            screen: Signup05, options: { headerShown: false }
-         },
-         Login04: {
-            screen: Login04, options: { headerShown: false }
-         },
-         Logsignup03: {
-            screen: Logsignup03, options: { headerShown: false }
-         },
-
-
-      }
-   })
 
 
 
    // const StackNavigator = createNativeStackNavigator({
-   //    screens: {
-   //       Contactlistscreen: Contactlistscreen,
-   //       Contactaddscreen: Contactaddscreen,
 
-   //       Contactdetailscreen: Contactdetailscreen
-   //    }, 
-   //    screenOptions: { headerShown: false }
+   //    screens: {
+   //       Splash_screen01: {
+   //          screen: Splash_screen01, options: { headerShown: false }
+   //       },
+   //       OnBoarding02: {
+   //          screen: OnBoarding02, options: { headerShown: false }
+   //       },
+   //       Account15: {
+   //          screen: Account15, options: { headerShown: false }
+   //       },
+   //       Message14: {
+   //          screen: Message14, options: { headerShown: false }
+   //       },
+   //       CheckOut13: {
+   //          screen: CheckOut13, options: { headerShown: false }
+   //       },
+   //       Cart12: {
+   //          screen: Cart12, options: { headerShown: false }
+   //       },
+   //       Productdetailscreen11: {
+   //          screen: Productdetailscreen11, options: { headerShown: false }
+   //       },
+   //       Search09: {
+   //          screen: Search09, options: { headerShown: false }
+   //       },
+   //       Home08: {
+   //          screen: BottomNavigator, options: { headerShown: false }
+   //       },
+   //       VerifyOtp07: {
+   //          screen: VerifyOtp07, options: { headerShown: false }
+   //       },
+   //       ForgotPassword06: {
+   //          screen: ForgotPassword06, options: { headerShown: false }
+   //       },
+   //       Signup05: {
+   //          screen: Signup05, options: { headerShown: false }
+   //       },
+   //       Login04: {
+   //          screen: Login04, options: { headerShown: false }
+   //       },
+   //       Logsignup03: {
+   //          screen: Logsignup03, options: { headerShown: false }
+   //       },
+
+
+   //    }
    // })
+
+
+
+   const StackNavigator = createNativeStackNavigator({
+      screens: {
+         Contactlistscreen: Contactlistscreen2,
+         Contactaddscreen: Contactaddscreen2,
+
+         Contactdetailscreen: Contactdetailscreen2
+      }, 
+      screenOptions: { headerShown: false }
+   })
 
 
 

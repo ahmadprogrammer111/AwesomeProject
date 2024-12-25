@@ -11,32 +11,34 @@ const Splash_screen01 = () => {
     const [initializing, setInitializing] = useState(true)
 
 
-    const userAuthentication = (user: any) => {
+    const onAuthStateChanged = (user: any) => {
         setUser(user);
+        console.log('User FOund', user)
         if (initializing) {
             setInitializing(false)
         }
     }
 
-
     useEffect(() => {
 
-        const subscriber = auth().onAuthStateChanged(userAuthentication)
+        const subscriber = auth().onAuthStateChanged(onAuthStateChanged)
         return subscriber
     }, [])
 
-
     useEffect(() => {
         setTimeout(() => {
-            if (!user) {
-                navigation.navigate('OnBoarding02' as never)
-
-            } else if (user) {
-                navigation.navigate('Login04' as never)
+            if (!initializing) {
+                if (user) {
+                    navigation.navigate('Home08' as never);
+                }
+                if (user == null) {
+                    navigation.navigate('Logsignup03' as never);
+                }
             }
-        }, 2000); () => {
-        }
-    }, [])
+        }, 2000);
+    }, [initializing, user])
+
+
 
 
 

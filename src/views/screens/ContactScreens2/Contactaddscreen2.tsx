@@ -2,7 +2,7 @@
 import { StyleSheet, Text, View, TouchableOpacity, TextInput, Image, Alert, Button } from 'react-native'
 import React, { useCallback, useEffect, useState } from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import Contactlistscreen from './Contactlistscreen'
+
 import { useFocusEffect, useNavigation } from '@react-navigation/native'
 import CustomInput from '../../../components/CustomInput'
 import Icon from 'react-native-vector-icons/Ionicons'

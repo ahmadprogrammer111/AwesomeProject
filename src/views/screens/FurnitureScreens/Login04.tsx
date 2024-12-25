@@ -1,34 +1,89 @@
-import { StyleSheet, Text, View, TextInput, Pressable, Touchable, TouchableOpacity } from 'react-native'
+import { StyleSheet, Text, View, TextInput, Pressable, Touchable, TouchableOpacity, Alert } from 'react-native'
 import React, { useState } from 'react'
 import Furnitureheader1 from '../../../components/Furniture_components/Furnitureheader1'
 import FurnitureButton from '../../../components/Furniture_components/FurnitureButton'
 import Furnitureinput from '../../../components/Furniture_components/Furnitureinput'
 import FurnitureButton2 from '../../../components/Furniture_components/FurnitureButton2'
 import { useNavigation } from '@react-navigation/native'
+import auth from '@react-native-firebase/auth'
 
 const Login04 = () => {
-   const [name, setname] = useState('')
    const [Onpress, setOnpress] = useState(false)
    const navigation = useNavigation()
+   const [email, setEmail] = useState('')
+   const [password, setPassword] = useState('')
+
+   // console.log('Email:', email) 
+   // console.log('Password:', password) 
+
+
+
+   const createUserWithEmailAndPassword = async () => {
+      console.log('Email:', email);
+      console.log('Password:', password);
+      if (!email || !password) {
+         console.log('Email or Password is empty');
+         return Alert.alert('Email or Password is empty')
+         
+      }
+
+      auth()
+         .signInWithEmailAndPassword(email, password)
+         .then(() => {
+            console.log('User signed sucessfully')
+            navigation.navigate('Home08' as never)
+         })
+         .catch((error) => {
+            if (error.code == 'auth/email-already-in-use') {
+               console.log('That email address is already in use!')
+            }
+            if (error.code == 'auth/invalid-email') {
+               console.log('That email address is invalid!!')
+            }
+            if (error.code == 'auth/operation-not-allowed') {
+               console.log('The email is disabled by the owner of the app.')
+            }
+            console.log(error)
+         })
+   }
+
 
    return (
       <View style={styles.container}>
          <View style={styles.spaccer2} />
 
-         <Furnitureheader1 name='Log In' width='55%'/>
+         <Furnitureheader1 name='Log In' width='55%' />
          <View style={styles.spaccer} />
-         <Furnitureinput name='Email' placeholder='Text Your Email' />
+         <View style={styles.maininputcontainer}>
+            <Text style={styles.header}>Email</Text>
+            <View style={styles.textinputcontainer}>
+               <TextInput value={email} onChangeText={setEmail}
+                  style={styles.textinput} placeholder='Text Your Email' placeholderTextColor='#838383' />
+            </View>
+         </View>
+
+
          <View style={styles.spaccer3} />
-         <Furnitureinput name='Password' placeholder='Text Your Password' />
+         {/* <Furnitureinput name='Password' placeholder='Text Your Password' text={password} onChangeText={setPassword} /> */}
+         <View style={styles.maininputcontainer}>
+            <Text style={styles.header}>Password</Text>
+            <View style={styles.textinputcontainer}>
+               <TextInput value={password} onChangeText={setPassword}
+                  style={styles.textinput} placeholder='Text Your Email' placeholderTextColor='#838383' />
+            </View>
+         </View>
          <View style={styles.options}>
             <Text style={styles.optionstext}>Remember me</Text>
             <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword06' as never)}>
                <Text style={[styles.optionstext, { color: '#838383' }]}>Forgot password?</Text>
             </TouchableOpacity>
          </View>
+
          <View style={styles.spaccer4} />
 
-         <FurnitureButton name='Log In' bgcolor='black' textcolor='white' screen={()=> navigation.navigate('Home08' as never)} />
+         <FurnitureButton name='Log In' bgcolor='black' textcolor='white' screen={() => {
+            createUserWithEmailAndPassword()
+         }} />
          <View style={styles.spaccer3} />
 
          <View style={styles.orContainer}>
@@ -42,13 +97,11 @@ const Login04 = () => {
          <FurnitureButton2 Iconname='facebook' name='Continue with Facebook' />
          <View style={styles.BottomtextContainer}>
             <Text style={styles.Bottomtext}>Dont't have an account? </Text>
-            <Pressable onPressIn={() => setOnpress(true)} onPressOut={() => setOnpress(false)} onPress={()=> navigation.navigate('Signup05' as never)}>
+            <Pressable onPressIn={() => setOnpress(true)} onPressOut={() => setOnpress(false)} onPress={() => navigation.navigate('Signup05' as never)}>
                <Text style={[styles.Bottomtext2, Onpress && styles.underlined]}>Register</Text>
             </Pressable>
          </View>
-
       </View>
-
    )
 }
 
@@ -69,9 +122,10 @@ const styles = StyleSheet.create({
       flex: 0.03,
    },
    spaccer4: {
-      flex: 0.05,
+      flex: 0.03,
    },
    options: {
+      marginVertical: 10,
       flexDirection: 'row',
       justifyContent: 'space-between',
       marginHorizontal: 30,
@@ -103,7 +157,27 @@ const styles = StyleSheet.create({
    },
    underlined: {
       textDecorationLine: 'underline'
-   }
+   },
+   maininputcontainer: {
+      marginHorizontal: 25,
+   },
+   textinputcontainer: {
+      // backgroundColor: 'blue',
+      borderWidth: 1,
+      borderRadius: 15,
+      borderColor: '#D9D9D9',
+   },
+   textinput: {
+      color: 'black',
+      fontFamily: 'Poppins-Regular'
+   },
+   header: {
+      fontFamily: 'Poppins-Regular',
+      color: 'black',
+      fontSize: 16,
+   },
+
+
 
 
 
