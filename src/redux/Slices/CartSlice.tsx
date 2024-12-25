@@ -1,7 +1,6 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+
 import { createSlice } from '@reduxjs/toolkit'
-import { QueryStatus } from '@reduxjs/toolkit/query'
+
 
 
 
@@ -23,6 +22,15 @@ const CartSlice = createSlice({
             }
         },
         removeItem: (state, action) => {
+            const existingitems = state.items.find((item: any) => item.id === action.payload.id)
+            if (existingitems?.quantity > 0) {
+                existingitems.quantity -= 1
+            }
+            if (existingitems?.quantity == 0) {
+                state.items = state.items.filter((item: any) => item.id !== action.payload.id)
+            }
+        },
+        deletItem: (state, action) => {
             state.items = state.items.filter((item: any) => item.id !== action.payload.id)
         },
         resetCart: (state) => {
@@ -32,6 +40,6 @@ const CartSlice = createSlice({
 })
 
 
-export const { addItem, removeItem, resetCart } = CartSlice.actions
+export const { addItem, removeItem, resetCart, deletItem } = CartSlice.actions
 export default CartSlice.reducer
 

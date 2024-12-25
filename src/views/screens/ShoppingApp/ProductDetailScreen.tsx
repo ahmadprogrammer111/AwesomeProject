@@ -1,40 +1,36 @@
 import { StyleSheet, Text, View, Image, Touchable, TouchableOpacity, Alert } from 'react-native'
 import React, { useCallback, useEffect } from 'react'
-import { useDispatch } from 'react-redux'
-import { addItem } from '../../../redux/Slices/CartSlice'
+import { useDispatch, useSelector } from 'react-redux'
+import { addItem, removeItem } from '../../../redux/Slices/CartSlice'
 import { useFocusEffect } from '@react-navigation/native'
+import Icon from 'react-native-vector-icons/AntDesign'
 
 const ProductDetailScreen = ({ route }: any) => {
 
    const { item, index } = route.params || {}
-   console.log('route', route?.params)
+
 
    console.log('item,', item?.image)
-   console.log('inedx:,', index)
+   console.log('inedx:,', item)
 
+   const cartItems = useSelector((state: any) => state.cart.items)
    const dispatch = useDispatch()
 
    const addToCart = () => {
       dispatch(addItem(item))
    }
 
-
    useEffect(() => {
-
-
       if (!item?.image) {
          return Alert.alert('Please select a product to get details')
-
-
-
       }
    }, [])
 
 
-
-
-
-
+   const itemQuantity = cartItems?.filter((element: any,) => element?.id === item?.id)
+   if (itemQuantity) {
+      // console.log('quan=========>', itemQuantity[0]?.quantity)
+   }
    return (
       <View style={styles.container}>
 
@@ -54,23 +50,26 @@ const ProductDetailScreen = ({ route }: any) => {
                      style={{
                         height: '100%',
                         width: '100%',
-
                      }}
                      source={{ uri: item?.image }}
                      onError={(e) => console.log('Cannot load Image', e.nativeEvent.error)}
                   />
                   :
-                  <Text style={{ color: 'black', fontSize: 20 }}> No IMage to show
-                  </Text>
-
+                  <Image
+                     resizeMode='contain'
+                     style={{
+                        height: '100%',
+                        width: '100%',
+                     }}
+                     source={require('../../../assets/images/placeholder.png')}
+                     onError={(e) => console.log('Cannot load Image', e.nativeEvent.error)} />
                }
             </View>
 
             <View style={{ flexDirection: 'row', }}>
-               <Text numberOfLines={3} style={{ color: '#000000', fontSize: 17.5, fontWeight: '700', marginTop: 24, marginLeft: 23, width: '65%', }}>{item?.title}</Text>
+               <Text numberOfLines={3} style={styles.title}>{item?.title}</Text>
                <Text style={{ color: '#757575', fontSize: 14, fontWeight: '700', marginTop: 28.5, marginLeft: 33, }}>{item?.price}  $</Text>
             </View>
-
             <View>
                <Text style={{ color: '#000000', fontSize: 13, fontWeight: '700', marginTop: 21, marginLeft: 33, }}>Size</Text>
             </View>
@@ -86,15 +85,26 @@ const ProductDetailScreen = ({ route }: any) => {
                <Text style={{ color: '#000000', fontSize: 13, fontWeight: '700', marginTop: 15, marginLeft: 33, }}>Color</Text>
             </View>
 
-            <View style={styles.colorandsize}>
-               <Image style={{ marginRight: 7, width: 62.5, height: 62.5, }} source={require('../../../assets/images/Group_7.png')} />
-               <Image style={{ marginRight: 7, width: 57, height: 57, }} source={require('../../../assets/images/Ellipse_9.png')} />
-               <Image style={{ marginRight: 7, width: 57, height: 57, }} source={require('../../../assets/images/Ellipse_10.png')} />
-            </View>
-            <View style={styles.spaccer} />
+         </View>
+         <View style={{ flexDirection: 'row', justifyContent: 'space-around', height: 200 }}>
+
+            <TouchableOpacity
+               onPress={() => dispatch(removeItem(item))} disabled={itemQuantity[0]?.quantity == 0 || !item?.id ? true : false}>
+               <Icon name='minussquare' size={30} color={itemQuantity[0]?.quantity == 0 || !item?.id? 'grey' : 'black'} />
+            </TouchableOpacity>
+
+            <Text style={{ color: 'black' }}>{itemQuantity[0]?.quantity ? itemQuantity[0]?.quantity : 0}</Text>
+
+            <TouchableOpacity disabled={!item?.id ? true : false}
+               onPress={() => dispatch(addItem(item))}>
+               <Icon name='plussquare' size={30} color={itemQuantity[0]?.quantity == 0 || !item?.id? 'grey' : 'black'} />
+            </TouchableOpacity>
+
          </View>
 
-         <TouchableOpacity onPress={addToCart} disabled={!item?.id ? true : false} style={styles.addtocartview}>
+         <TouchableOpacity
+            onPress={addToCart} disabled={!item?.id || itemQuantity[0]?.quantity == 0 ? true : false}
+            style={[styles.addtocartview, { backgroundColor: !item?.id || itemQuantity[0]?.quantity == 0 ? 'grey' : '#C85959' }]}>
             <Text style={{ fontSize: 22, fontWeight: '800', color: 'white' }}>Add to Cart</Text>
          </TouchableOpacity>
       </View>
@@ -151,7 +161,7 @@ const styles = StyleSheet.create({
       position: 'absolute',
       alignItems: 'center',
       justifyContent: 'center',
-      backgroundColor: '#C85959',
+      // backgroundColor: '#C85959',
       height: 65,
       width: '100%',
       alignSelf: 'center',
@@ -161,6 +171,14 @@ const styles = StyleSheet.create({
    },
    spaccer: {
       height: 20
+   },
+   title: {
+      color: '#000000',
+      fontSize: 17.5,
+      fontWeight: '700',
+      marginTop: 24,
+      marginLeft: 23,
+      width: '65%',
    }
 
 })

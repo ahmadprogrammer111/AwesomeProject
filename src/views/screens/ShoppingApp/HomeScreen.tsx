@@ -17,7 +17,7 @@ const HomeScreen = () => {
    const [productsData, setProductsData] = useState<any>([])
    const [isLoading, setIsLoading] = useState(true)
    const [first, setfirst] = useState('')
-   const [isSelected, setIsSelected] = useState<number | null>(1)
+   const [isSelected, setIsSelected] = useState<number>(1)
 
 
    const handlePress = (buttonId: number) => {

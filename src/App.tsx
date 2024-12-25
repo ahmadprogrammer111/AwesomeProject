@@ -45,6 +45,7 @@ import HomeScreen from './views/screens/ShoppingApp/HomeScreen.tsx'
 import CartScreen from './views/screens/ShoppingApp/CartScreen.tsx'
 import { Provider, useSelector } from 'react-redux'
 import store from './redux/store.tsx'
+// import bottomNavigator from './components/navigation.tsx'
 
 
 
@@ -53,122 +54,120 @@ import store from './redux/store.tsx'
 
 const App = () => {
 
-   // const cartItems = useSelector((state: any) => state.cart.items)
+   // const bottomNavigator = createBottomTabNavigator({
 
-   // const cartCount = cartItems.reduce((total: number, item: any) => {
-   //    total + item.quantity
-   // }, 0)
+   //    screens: {
+   //       HomeScreen: {
+   //          screen: HomeScreen,
+   //          options: {
+   //             tabBarIcon: ({ color }) => <Icon6 name='home' size={35} color={color} style={{ height: '120%' }} />
+   //          }
+   //       },
+   //       ProductDetailScreen: {
+   //          screen: ProductDetailScreen,
+   //          options: {
+   //             tabBarIcon: ({ color }) => <Icon5 name='menu' size={35} color={color} style={{ height: '120%' }} />
+   //          }
+   //       },
+   //       CartScreen: {
+   //          screen: CartScreen,
+   //          options: {
+   //             tabBarBadge: 0,
+   //             tabBarIcon: ({ color }) => <Icon7 name='cart-sharp' size={35} color={color} style={{ height: '120%' }} />,
+   //          }
+   //       }
+   //    },
+   //    screenOptions: {
+   //       headerShown: false, tabBarShowLabel: false, tabBarActiveTintColor: '#ED6767', tabBarStyle: {
+   //          paddingTop: 3
+   //       }
+   //    }
+   // })
 
-   
-   const bottomNavigator = createBottomTabNavigator({
+
+
+   const BottomNavigator = createBottomTabNavigator({
 
       screens: {
-         HomeScreen: {
-            screen: HomeScreen,
-            options: {
-               tabBarIcon: ({ color }) => <Icon6 name='home' size={35} color={color} style={{ height: '120%' }} />
-            }
+         Home: {
+            screen: Home08, options: { tabBarIcon: ({ color }) => <Icon name='home' size={30} color={color} /> }
          },
-         ProductDetailScreen: {
-            screen: ProductDetailScreen,
-            options: {
-
-               tabBarIcon: ({ color }) => <Icon5 name='menu' size={35} color={color} style={{ height: '120%' }} />
-            }
+         Product010: {
+            screen: Product010, options: { tabBarIcon: ({ color }) => <Icon2 name='bookshelf' size={30} color={color} /> }
          },
-         CartScreen: {
-            screen: CartScreen,
-            options: {
-
-               tabBarIcon: ({ color }) => <Icon7 name='cart-sharp' size={35} color={color} style={{ height: '120%' }} />,
-            }
-         }
+         Search09: {
+            screen: Search09, options: { tabBarIcon: ({ color }) => <Icon3 name='bookmark' size={25} color={color}  /> }
+         },
+        Message14: {
+            screen: Message14, options: { tabBarIcon: ({ color }) => <Icon4 name='chat-bubble-outline' size={30} color={color}  /> }
+         },
+         Account15: {
+            screen: Account15, options: { tabBarIcon: ({ color }) => <Icon2 name='account' size={30} color={color}  /> }
+         },
       },
-      screenOptions: {
-         headerShown: false, tabBarShowLabel: false, tabBarActiveTintColor: '#ED6767', tabBarStyle: {
-            paddingTop: 3
-         }
-      }
+      screenOptions: { tabBarActiveTintColor: 'black', headerShown: false, tabBarShowLabel: false, tabBarStyle :{
+height:'8%' ,
+paddingTop: 10
+// alignItems: 'center',
+// justifyContent: 'center'
+      } },
+
    })
 
 
-   // const BottomNavigator = createBottomTabNavigator({
-
-   //    screens: {
-   //       Home: {
-   //          screen: Home08, options: { tabBarIcon: ({ color }) => <Icon name='home' size={30} color={color} /> }
-   //       },
-   //       Product010: {
-   //          screen: Product010, options: { tabBarIcon: ({ color }) => <Icon2 name='bookshelf' size={30} color={color} /> }
-   //       },
-   //       Search09: {
-   //          screen: Search09, options: { tabBarIcon: ({ color }) => <Icon3 name='bookmark' size={25} color={color}  /> }
-   //       },
-   //      Message14: {
-   //          screen: Message14, options: { tabBarIcon: ({ color }) => <Icon4 name='chat-bubble-outline' size={30} color={color}  /> }
-   //       },
-   //       Account15: {
-   //          screen: Account15, options: { tabBarIcon: ({ color }) => <Icon2 name='account' size={30} color={color}  /> }
-   //       },
-   //    },
-   //    screenOptions: { tabBarActiveTintColor: 'black', headerShown: false, tabBarShowLabel: false,  },
-
-   // })
 
 
 
 
+   const StackNavigator = createNativeStackNavigator({
+
+      screens: {
+         Splash_screen01: {
+            screen: Splash_screen01, options: { headerShown: false }
+         },
+         OnBoarding02: {
+            screen: OnBoarding02, options: { headerShown: false }
+         },
+         Account15: {
+            screen: Account15, options: { headerShown: false }
+         },
+         Message14: {
+            screen: Message14, options: { headerShown: false }
+         },
+         CheckOut13: {
+            screen: CheckOut13, options: { headerShown: false }
+         },
+         Cart12: {
+            screen: Cart12, options: { headerShown: false }
+         },
+         Productdetailscreen11: {
+            screen: Productdetailscreen11, options: { headerShown: false }
+         },
+         Search09: {
+            screen: Search09, options: { headerShown: false }
+         },
+         Home08: {
+            screen:BottomNavigator, options: { headerShown: false }
+         },
+         VerifyOtp07: {
+            screen: VerifyOtp07, options: { headerShown: false }
+         },
+         ForgotPassword06: {
+            screen: ForgotPassword06, options: { headerShown: false }
+         },
+         Signup05: {
+            screen: Signup05, options: { headerShown: false }
+         },
+         Login04: {
+            screen: Login04, options: { headerShown: false }
+         },
+         Logsignup03: {
+            screen: Logsignup03, options: { headerShown: false }
+         },
 
 
-   // const StackNavigator = createNativeStackNavigator({
-
-   //    screens: {
-   //       Splash_screen01: {
-   //          screen: Splash_screen01, options: { headerShown: false }
-   //       },
-   //       OnBoarding02: {
-   //          screen: OnBoarding02, options: { headerShown: false }
-   //       },
-   //       Account15: {
-   //          screen: Account15, options: { headerShown: false }
-   //       },
-   //       Message14: {
-   //          screen: Message14, options: { headerShown: false }
-   //       },
-   //       CheckOut13: {
-   //          screen: CheckOut13, options: { headerShown: false }
-   //       },
-   //       Cart12: {
-   //          screen: Cart12, options: { headerShown: false }
-   //       },
-   //       Productdetailscreen11: {
-   //          screen: Productdetailscreen11, options: { headerShown: false }
-   //       },
-   //       Search09: {
-   //          screen: Search09, options: { headerShown: false }
-   //       },
-   //       Home08: {
-   //          screen:BottomNavigator, options: { headerShown: false }
-   //       },
-   //       VerifyOtp07: {
-   //          screen: VerifyOtp07, options: { headerShown: false }
-   //       },
-   //       ForgotPassword06: {
-   //          screen: ForgotPassword06, options: { headerShown: false }
-   //       },
-   //       Signup05: {
-   //          screen: Signup05, options: { headerShown: false }
-   //       },
-   //       Login04: {
-   //          screen: Login04, options: { headerShown: false }
-   //       },
-   //       Logsignup03: {
-   //          screen: Logsignup03, options: { headerShown: false }
-   //       },
-
-
-   //    }
-   // })
+      }
+   })
 
 
 
@@ -184,14 +183,18 @@ const App = () => {
 
 
 
-   const Navigation = createStaticNavigation(bottomNavigator)
-
+   const Navigation = createStaticNavigation(StackNavigator)
    return (
       <Provider store={store}>
+
          <Navigation />
+
       </Provider>
    )
 }
+
+
+
 
 export default App
 
