@@ -48,6 +48,8 @@ import store from './redux/store.tsx'
 import Contactdetailscreen2 from './views/screens/ContactScreens2/Contactdetailscreen2.tsx'
 import Contactaddscreen2 from './views/screens/ContactScreens2/Contactaddscreen2.tsx'
 import Contactlistscreen2 from './views/screens/ContactScreens2/Contactlistscreen2.tsx'
+import { LogLevel, OneSignal } from 'react-native-onesignal';
+
 
 
 
@@ -181,9 +183,41 @@ const App = () => {
          Contactaddscreen: Contactaddscreen2,
 
          Contactdetailscreen: Contactdetailscreen2
-      }, 
+      },
       screenOptions: { headerShown: false }
    })
+
+
+
+
+
+
+
+
+   // Add OneSignal within your App's root component
+
+
+
+   // Add OneSignal within your App's root component
+   
+   
+     // Remove this method to stop OneSignal Debugging
+     OneSignal.Debug.setLogLevel(LogLevel.Verbose);
+   
+     // OneSignal Initialization
+     OneSignal.initialize("479ae6a7-d38e-4116-88a4-0835ca09a6d4");
+   
+     // requestPermission will show the native iOS or Android notification permission prompt.
+     // We recommend removing the following code and instead using an In-App Message to prompt for notification permission
+     OneSignal.Notifications.requestPermission(true);
+   
+     // Method for listening for notification clicks
+     OneSignal.Notifications.addEventListener('click', (event) => {
+       console.log('OneSignal: notification clicked:', event);
+     });
+
+
+
 
 
 
