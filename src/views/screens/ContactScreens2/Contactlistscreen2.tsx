@@ -1,9 +1,10 @@
-import { Image, StyleSheet, TouchableOpacity, Text, View, FlatList } from 'react-native'
-import React, { useCallback } from 'react'
+import { Image, StyleSheet, TouchableOpacity, Text, View, FlatList, ActivityIndicator } from 'react-native'
+import React, { useCallback, useEffect } from 'react'
 import { useState } from 'react'
 // import { useEffect } from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useFocusEffect, useNavigation } from '@react-navigation/native'
+import firestore from '@react-native-firebase/firestore';
 
 
 
@@ -18,52 +19,27 @@ import { TextInput } from 'react-native-gesture-handler'
 
 
 const Contactlistscreen = () => {
-
-
+   const [isLoading, setIsLoading] = useState(true)
    const [contacts, setContacts] = useState([])
    const navigation = useNavigation<any>();
 
-   useFocusEffect(
-      useCallback(() => {
-         getStoredObjectValue()
-      }, [])
-   )
-
-   const getStoredObjectValue = async () => {
-      try {
-         const jsonvalue = await AsyncStorage.getItem('Contacts')
-         const storedobjectvalue = JSON.parse(jsonvalue as any)
-         if (storedobjectvalue !== null) {
-            setContacts(storedobjectvalue as any)
-            
-
-         }
-         console.log('Got stored value', storedobjectvalue)
-      } catch (error) {
-         console.log('Error', error)
-      }
-   }
-
-   console.log(contacts)
-
-   // const deleteContact = async (index: any) => {
-   //    try {
-   //       const filteredcontactarray = contacts.filter((_, i) => i !== index)
-   //       setContacts(filteredcontactarray)
-   //       const jsonvalue = JSON.stringify(filteredcontactarray)
-   //       await AsyncStorage.setItem('Contacts', jsonvalue)
-   //       console.log('Your contact deleted')
-   //    } catch (error) {
-   //       console.log('Error', error)
-   //    }
-   // }
-
+   useEffect(() => {
+      const subscriber = firestore()
+         .collection('Users')
+         .doc('usersArray')
+         .onSnapshot(documentSnapshot => {
+            console.log('User data: ', documentSnapshot.data());
+            const data: any = documentSnapshot.data()
+            console.log(data.user)
+            setContacts(data.user)
+            setIsLoading(false)
+         });
+      return () => subscriber();
+   }, [])
 
    const exceedmaxlength = (text: string, maxlength: number) => {
       return text?.length > maxlength ? text.slice(0, maxlength) + '...' : text
    }
-
-
 
    const Showcontacts = ({ item, index }: any) => {
 
@@ -121,8 +97,7 @@ const Contactlistscreen = () => {
       )
    }
 
-   // Readme VVVVVVV
-   // Pass the date constant in the flatlist render function and then it will iterate that const array 
+
 
 
    const Emptylist_shower = () => {
@@ -163,12 +138,16 @@ const Contactlistscreen = () => {
                </TouchableOpacity>
             </View>
          </View>
+         
+         {isLoading ? <View><ActivityIndicator size='large' color='blue' /></View> :
+            <>
+               <Emptylist_shower />
 
-         <Emptylist_shower />
-
-         <TouchableOpacity style={styles.addcontactbutton} onPress={() => navigation.navigate('Contactaddscreen')}>
-            <Icon4 name='plus' size={22} color='white' />
-         </TouchableOpacity>
+               <TouchableOpacity style={styles.addcontactbutton} onPress={() => navigation.navigate('Contactaddscreen')}>
+                  <Icon4 name='plus' size={22} color='white' />
+               </TouchableOpacity>
+            </>
+         }
       </View>
 
 

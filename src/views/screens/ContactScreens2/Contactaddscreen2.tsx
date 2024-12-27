@@ -2,6 +2,7 @@
 import { StyleSheet, Text, View, TouchableOpacity, TextInput, Image, Alert, Button } from 'react-native'
 import React, { useCallback, useEffect, useState } from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import firestore from '@react-native-firebase/firestore';
 
 import { useFocusEffect, useNavigation } from '@react-navigation/native'
 import CustomInput from '../../../components/CustomInput'
@@ -16,8 +17,8 @@ import { launchImageLibrary } from 'react-native-image-picker'
 
 const Contactaddscreen = ({ route }: any) => {
    const { data, index } = route.params || {}
-   console.log('data', data)
-   console.log('index:===>', index)
+   // console.log('data', data)
+   // console.log('index:===>', index)
 
 
    // console.log('Contact info', data)
@@ -45,7 +46,7 @@ const Contactaddscreen = ({ route }: any) => {
    };
 
 
-   const navigation = useNavigation()
+   const navigation = useNavigation<any>()
    const [name, setName] = useState(data?.name ? data.name : '')
    const [surname, setSurname] = useState(data?.surname ? data.surname : '')
    const [phone, setPhone] = useState(data?.phone ? data.phone : '')
@@ -55,73 +56,84 @@ const Contactaddscreen = ({ route }: any) => {
 
    console.log('Before update:', contacts);
 
-   useFocusEffect(
-      useCallback(
-         () => {
-            getStoredObjectValue()
-         },
-         [],
-      )
-   )
+
+
+
+
+   useEffect(() => {
+      const subscriber = firestore()
+         .collection('Users')
+         .doc('usersArray')
+         .onSnapshot(documentSnapshot => {
+            console.log('User data: ', documentSnapshot.data());
+            const data: any = documentSnapshot.data()
+            console.log(data.user)
+            setContacts(data.user)
+         });
+
+      return () => subscriber();
+   }, [])
+
+
+   const updateContact = () => {
+      const oldContactslist: any = contacts
+      oldContactslist[index] = { name, phone, selectedImage, surname }
+      setContacts(oldContactslist)
+      try {
+         firestore()
+            .collection('Users')
+            .doc('usersArray')
+            .set({
+               user: oldContactslist
+            })
+            .then(() => {
+               console.log('Your updated User added!');
+            });
+      } catch (error) {
+         console.log('error', error)
+      }
+      navigation.navigate('Contactlistscreen')
+   }
 
    const savecontact = () => {
       if (name !== '' && phone !== '') {
          console.log('My contacts', contacts)
          const contactArray = [...contacts, { name, surname, phone, selectedImage }]
          setContacts(contactArray as any)
-         storeObjectValue(contactArray)
+         storeContact(contactArray)
          setName('')
          setSurname('')
          setPhone('')
          setSelectedImage(null)
-         navigation.navigate('Contactlistscreen' as never)
-
+         navigation.navigate('Contactlistscreen' )
       }
       else {
          Alert.alert('Please fill required data')
       }
    }
 
-   const updateContact = () => {
-
-      const oldContactslist = [...contacts] as any
-      oldContactslist[index] = { name, surname, phone, selectedImage }
-      console.log('Updating contact at index:', index);
-      storeObjectValue(oldContactslist)
-      navigation.navigate('Contactlistscreen' as never)
-
-   }
 
 
+   const storeContact = (contactList: any) => {
 
-
-   console.log('New contact data:', { name, surname, phone, selectedImage });
-   // useEffect(() => {
-   //    getStoredObjectValue( )
-   // }, [])
-
-   const storeObjectValue = async (Contactlist: any) => {
       try {
-         const jsonvalue = JSON.stringify(Contactlist)
-         await AsyncStorage.setItem('Contacts', jsonvalue)
-         console.log('your value stored')
+         firestore()
+            .collection('Users')
+            .doc('usersArray')
+            .set({
+               user: contactList
+            })
+            .then(() => {
+               console.log('User added!');
+            });
       } catch (error) {
-         console.log('Error', error)
+         console.log('error', error)
       }
    }
 
-   const getStoredObjectValue = async () => {
-      try {
-         const jsonvalue = await AsyncStorage.getItem('Contacts')
-         const storedobjectvalue = JSON.parse(jsonvalue as any)
-         if (storedobjectvalue !== null) {
-            setContacts(storedobjectvalue as any)
-         }
-         console.log('Got stored value', storedobjectvalue)
-      } catch (error) {
-         console.log('Error', error)
-      }
-   }
+
+
+
 
 
    return (

@@ -1,8 +1,9 @@
-import { StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native'
+import { StyleSheet, Text, View, TouchableOpacity, Image, ActionSheetIOS, ActivityIndicator } from 'react-native'
 import React, { useCallback, useEffect } from 'react'
 import { useFocusEffect, useNavigation } from '@react-navigation/native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useState } from 'react'
+import firestore from '@react-native-firebase/firestore'
 
 
 import Icon from 'react-native-vector-icons/Ionicons'
@@ -14,56 +15,48 @@ import { launchImageLibrary } from 'react-native-image-picker'
 
 
 const Contactdetailscreen = ({ route }: any) => {
+   const [isLoading, setIsLoading] = useState(true)
 
 
 
    const { data, index, } = route.params
+
+
    console.log('DATA ====>', data)
 
    const navigation = useNavigation<any>()
 
    const [contacts, setContacts] = useState([])
 
-
-   useFocusEffect(
-      useCallback(() => {
-         getStoredObjectValue()
-      },
-         [],
-      )
-   )
-
-
-   const getStoredObjectValue = async () => {
+   const deleteContact = () => {
       try {
-         const jsonvalue = await AsyncStorage.getItem('Contacts')
-         const storedobjectvalue = JSON.parse(jsonvalue as any)
-         if (storedobjectvalue !== null) {
-            setContacts(storedobjectvalue as any)
-         }
-         console.log('Got stored value', storedobjectvalue)
+         firestore()
+            .collection('Users')
+            .doc('usersArray')
+            .update({
+               user: firestore.FieldValue.arrayRemove({
+                  name: data.name,
+                  phone: data.phone,
+                  selectedImage: data.selectedImage,
+                  surname: data.surname,
+               }),
+            })
+         console.log('your contact deleted')
+         setIsLoading(false)
+         navigation.goBack();
       } catch (error) {
-         console.log('Error', error)
+         console.log('errr deleting contact', error)
       }
    }
 
 
 
-   const deleteContact = async (indextodelete: any) => {
-      try {
-         const filteredcontactarray = contacts.filter((_, i) => i !== indextodelete)
-         setContacts(filteredcontactarray)
-         const jsonvalue = JSON.stringify(filteredcontactarray)
-         await AsyncStorage.setItem('Contacts', jsonvalue)
-         console.log('Your contact deleted')
-         navigation.goBack()
-      } catch (error) {
-         console.log('Error', error)
-      }
-   }
 
    return (
       <View style={styles.container}>
+         {/* {isLoading ? */}
+         {/* <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}><ActivityIndicator size='large' color='blue' /> </View> :
+            <> */}
          <View style={styles.Headercontainer}>
             <View style={styles.imagecontainer}>
                <TouchableOpacity
@@ -92,7 +85,7 @@ const Contactdetailscreen = ({ route }: any) => {
          <View style={styles.spaccer} />
 
          <View style={styles.contactpiccontainer}>
-            {/* <Icon1 name="account-circle" size={150} color="grey" style={styles.Contactpic} /> */}
+
 
             {data.selectedImage ? data.selectedImage &&
                <Image style={{ height: 150, width: 150, borderRadius: 100, }} source={{ uri: data.selectedImage }} /> :
@@ -104,7 +97,10 @@ const Contactdetailscreen = ({ route }: any) => {
 
 
             <View style={styles.Iconcontainer}>
-               <TouchableOpacity onPress={() => deleteContact(index)}>
+               <TouchableOpacity onPress={() => {
+                  deleteContact();
+
+               }}>
                   <Icon2 name="delete" size={35} color="black" style={styles.delete} />
                </TouchableOpacity>
 
@@ -167,11 +163,9 @@ const Contactdetailscreen = ({ route }: any) => {
 
             <Callhistory date='Mar 05, 19:23' datestyle={styles.callhistorytext} number='+998901234567' iconname='arrow-top-right' iconcolor='black' status='Outgoing 15 min 12 sec' />
             <Callhistory date='Feb 12, 08:03' datestyle={styles.callhistorytext} number='+998901234567' iconname='arrow-top-right' iconcolor='black' status='Incoming 30 sec' />
-
-
-
-
          </View>
+         {/* </>
+         } */}
       </View>
 
    )
