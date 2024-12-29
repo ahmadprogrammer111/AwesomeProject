@@ -77,6 +77,16 @@
 		<string>Overpass-Medium.ttf</string>
 		<string>Overpass-Regular.ttf</string>
 		<string>PlusJakartaSans-Regular.ttf</string>
+		<string>Nunito-Bold.ttf</string>
+		<string>Nunito-Medium.ttf</string>
+		<string>Nunito-Regular.ttf</string>
+		<string>Nunito-SemiBold.ttf</string>
+		<string>Raleway-Black.ttf</string>
+		<string>Raleway-Bold.ttf</string>
+		<string>Raleway-ExtraBold.ttf</string>
+		<string>Raleway-Medium.ttf</string>
+		<string>Raleway-Regular.ttf</string>
+		<string>Raleway-SemiBold.ttf</string>
 	</array>
 </dict>
 </plist>

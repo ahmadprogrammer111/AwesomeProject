@@ -1,4 +1,4 @@
-import { View } from 'react-native'
+import { TouchableOpacity, View } from 'react-native'
 import React from 'react'
 import Contactaddscreen from './views/screens/ContactScreens/Contactaddscreen'
 import Contactlistscreen from './views/screens/ContactScreens/Contactlistscreen'
@@ -21,9 +21,11 @@ import Icon4 from 'react-native-vector-icons/MaterialIcons.js'
 import Icon5 from 'react-native-vector-icons/Entypo.js'
 import Icon6 from 'react-native-vector-icons/Foundation.js'
 import Icon7 from 'react-native-vector-icons/Ionicons.js'
+// import Icon8 from 'react-native-vector-icons/Fontisto.js'
 
 
-import { createStaticNavigation, NavigationContainer } from '@react-navigation/native'
+
+import { createStaticNavigation, NavigationContainer, useNavigation } from '@react-navigation/native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { createDrawerNavigator, DrawerItem } from '@react-navigation/drawer'
@@ -49,6 +51,14 @@ import Contactdetailscreen2 from './views/screens/ContactScreens2/Contactdetails
 import Contactaddscreen2 from './views/screens/ContactScreens2/Contactaddscreen2.tsx'
 import Contactlistscreen2 from './views/screens/ContactScreens2/Contactlistscreen2.tsx'
 import { LogLevel, OneSignal } from 'react-native-onesignal';
+import ThreadsHome from './views/screens/ThreadsApp/ThreadsHome.tsx'
+import ThreadsDetails from './views/screens/ThreadsApp/ThreadsDetails.tsx'
+import ThreadsSearch from './views/screens/ThreadsApp/ThreadsSearch.tsx'
+import ThreadsCreate from './views/screens/ThreadsApp/ThreadsCreate.tsx'
+import ThreadsCreateIcon from './components/ThreadsComponents/ThreadsCreateIcon.tsx'
+import ThreadsActivity from './views/screens/ThreadsApp/ThreadsFeed.tsx'
+import ThreadsFeed from './views/screens/ThreadsApp/ThreadsFeed.tsx'
+import ThreadsProfile from './views/screens/ThreadsApp/ThreadsProfile.tsx'
 
 
 
@@ -58,6 +68,7 @@ import { LogLevel, OneSignal } from 'react-native-onesignal';
 
 
 const App = () => {
+
 
    // const bottomNavigator = createBottomTabNavigator({
 
@@ -175,53 +186,130 @@ const App = () => {
    //    }
    // })
 
+   // const StackNavigator = createNativeStackNavigator({
+   //    screens: {
+   //       Contactlistscreen: Contactlistscreen2,
+   //       Contactaddscreen: Contactaddscreen2,
+
+   //       Contactdetailscreen: Contactdetailscreen2
+   //    },
+   //    screenOptions: { headerShown: false }
+   // })
+
+   // Add OneSignal within your App's root component
+   // Add OneSignal within your App's root component
 
 
-   const StackNavigator = createNativeStackNavigator({
+   // Remove this method to stop OneSignal Debugging
+
+   // const MenuIcon = () => {
+   //    return (
+   //       <TouchableOpacity onPress={()=> navigation.navigate('ThreadsProfile1' as never)  }>
+   //          <Icon5 name='menu' size={30} color='black' style={{ marginRight: 30 }} />
+   //       </TouchableOpacity>
+   //    )
+   // }
+
+   const RemoveOpacity = (props: any) => {
+      return (
+         <TouchableOpacity {...props} activeOpacity={1} />)
+   }
+   const RemoveRippleEffect = (props: any) => {
+      return (
+         <TouchableOpacity {...props} activeOpacity={0} />)
+   }
+
+
+
+   const DrawerNavigator = createDrawerNavigator({
       screens: {
-         Contactlistscreen: Contactlistscreen2,
-         Contactaddscreen: Contactaddscreen2,
-
-         Contactdetailscreen: Contactdetailscreen2
+         ThreadsProfile: ThreadsProfile,
       },
-      screenOptions: { headerShown: false }
+      screenOptions: {
+         headerShown: false,
+      }
+   })
+
+   const BottomNavigator = createBottomTabNavigator({
+
+      screens: {
+         ThreadsHome: {
+            screen: ThreadsHome, options: {
+               tabBarButton: (props) => (<RemoveRippleEffect {...props} />
+               ),
+               tabBarIcon: ({ color }) => <Icon6 name='home' color={color} size={30} />
+            }
+         },
+         ThreadsSearch: {
+            screen: ThreadsSearch, options: {
+               tabBarButton: (props) => (<RemoveRippleEffect {...props} />
+               ),
+               tabBarIcon: ({ color }) => <Icon4 name='search' color={color} size={30} />
+            }
+         },
+         ThreadsCreate: {
+            screen: ThreadsCreate, options: {
+               tabBarButton: (props) => (<RemoveOpacity {...props} />
+               ),
+               tabBarIcon: ({ color }) => <ThreadsCreateIcon color={color} />
+            }
+         },
+         ThreadsFeed: {
+            screen: ThreadsFeed, options: {
+               tabBarButton: (props) => (<RemoveRippleEffect {...props} />
+               ),
+               tabBarIcon: ({ color }) => <Icon7 name='heart-half' color={color} size={27} />
+            }
+         },
+         ThreadsProfile1: {
+            screen: DrawerNavigator, options: {
+               // headerShown: true,
+               // headerTitle: "",
+               // headerShadowVisible: false,
+               // headerRight: () => <MenuIcon />,
+               tabBarButton: (props) => (<RemoveRippleEffect {...props} />
+               ),
+               tabBarIcon: ({ color }) => <Icon7 name='person' color={color} size={25} />
+            }
+         },
+      },
+      screenOptions: {
+
+         tabBarStyle: {
+            paddingTop: 3,
+            // borderTopWidth: 0,
+            elevation: 0,
+            backgroundColor: '#eaeded'
+         },
+         headerShown: false,
+         tabBarShowLabel: false,
+         tabBarBackground: () => false,
+         tabBarActiveTintColor: 'black',
+         tabBarHideOnKeyboard: true,
+      },
    })
 
 
+   OneSignal.Debug.setLogLevel(LogLevel.Verbose);
+
+   // OneSignal Initialization
+   OneSignal.initialize("479ae6a7-d38e-4116-88a4-0835ca09a6d4");
+
+   // requestPermission will show the native iOS or Android notification permission prompt.
+   // We recommend removing the following code and instead using an In-App Message to prompt for notification permission
+   OneSignal.Notifications.requestPermission(true);
+
+   // Method for listening for notification clicks
+   OneSignal.Notifications.addEventListener('click', (event) => {
+      console.log('OneSignal: notification clicked:', event);
+   });
 
 
 
 
 
 
-   // Add OneSignal within your App's root component
-
-
-
-   // Add OneSignal within your App's root component
-   
-   
-     // Remove this method to stop OneSignal Debugging
-     OneSignal.Debug.setLogLevel(LogLevel.Verbose);
-   
-     // OneSignal Initialization
-     OneSignal.initialize("479ae6a7-d38e-4116-88a4-0835ca09a6d4");
-   
-     // requestPermission will show the native iOS or Android notification permission prompt.
-     // We recommend removing the following code and instead using an In-App Message to prompt for notification permission
-     OneSignal.Notifications.requestPermission(true);
-   
-     // Method for listening for notification clicks
-     OneSignal.Notifications.addEventListener('click', (event) => {
-       console.log('OneSignal: notification clicked:', event);
-     });
-
-
-
-
-
-
-   const Navigation = createStaticNavigation(StackNavigator)
+   const Navigation = createStaticNavigation(BottomNavigator)
    return (
       <Provider store={store}>
 
