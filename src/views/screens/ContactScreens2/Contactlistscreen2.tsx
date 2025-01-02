@@ -67,7 +67,6 @@ const Contactlistscreen = () => {
                         </View>
                      }
 
-
                      <View style={{
                         // backgroundColor: 'black', 
                         marginLeft: 10,
@@ -138,7 +137,7 @@ const Contactlistscreen = () => {
                </TouchableOpacity>
             </View>
          </View>
-         
+
          {isLoading ? <View><ActivityIndicator size='large' color='blue' /></View> :
             <>
                <Emptylist_shower />

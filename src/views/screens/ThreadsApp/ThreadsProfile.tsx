@@ -1,43 +1,223 @@
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import React from 'react'
-import Icon from 'react-native-vector-icons/Ionicons'
+import { Modal, StyleSheet, Text, TouchableOpacity, View, TextInput, Image } from 'react-native'
+import React, { useEffect, useState } from 'react'
+import Icon from 'react-native-vector-icons/FontAwesome'
+import Icon2 from 'react-native-vector-icons/Ionicons'
+import { DrawerActions, useNavigation } from '@react-navigation/native'
+import { useDispatch, useSelector } from 'react-redux'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import firestore from '@react-native-firebase/firestore'
+import { launchImageLibrary } from 'react-native-image-picker'
+import { addEmail } from '../../../redux/Slices/userSlice'
+
+
 
 
 
 const ThreadsProfile = () => {
 
+
+    const [data, setData] = useState<any>()
+    const [email, setEmail] = useState('')
+
+
+
+ 
+    const openImagePicker = () => {
+        const options: any = {
+            mediaType: 'photo',
+            includeBase64: false,
+            maxHeight: 2000,
+            maxWidth: 2000,
+        };
+
+        launchImageLibrary(options, (response: any) => {
+            if (response.didCancel) {
+                console.log('User cancelled image picker');
+            } else if (response.error) {
+                console.log('Image picker error: ', response.error);
+            } else {
+                let imageUri = response.uri || response.assets?.[0]?.uri;
+                setData({ ...data, selectedImage: imageUri })
+                console.log(' Edited selectedImage:', data?.selectedImage)
+            }
+        });
+    };
+
+
+    const Email = useSelector((state: any) => state.user.tempMail)
+
+
+    const setUserName = (Value: string) => {
+        setData({ ...data, username: Value });
+        console.log(' Edited userName:', data?.username)
+    }
+    const setBio = (Value: string) => {
+        setData({ ...data, bio: Value });
+        console.log(' Edited Bio:', data?.bio)
+    }
+
+    useEffect(() => {
+        const getStoredEmail = async () => {
+            try {
+                if (Email) {
+                    console.log('Email getting from redux: ', email)
+                } else {
+                    console.log('No Email from redux')
+                }
+                setEmail(Email)
+                console.log('Email!! from redux store', Email)
+
+                if (Email) {
+                    const subscriber = firestore()
+                        .collection('Users')
+                        .where('email', '==', Email)
+                        .onSnapshot(documentSnapshot => {
+                            console.log('User data: ', documentSnapshot.docs[0].data())
+                            const userData = documentSnapshot.docs[0].data()
+                            setData(userData)
+                        })
+                    return () => subscriber();
+                } else {
+                    console.log('from profile screenThere is no value in Email: ', Email)
+                }
+
+            } catch (error) {
+                console.log('Err fetching Email from redux-persist', error)
+            }
+        }
+        getStoredEmail()
+
+    }, [])
+
+
+
+    const updateProfile = () => {
+        firestore()
+            .collection('Users')
+            .doc(email)
+            .update({
+                username: data?.username,
+                bio: data?.bio,
+                selectedImage: data?.selectedImage,
+            })
+            .then(() => {
+                console.log(`User with Email:  ${email}  updated!`);
+            });
+    }
+
+
+
+    const Line = (props: any) => {
+        const { width } = props
+        return (
+            <View style={{ height: 1, backgroundColor: '#d0d3d4', width: width, alignSelf: 'flex-start', marginHorizontal: 20, marginBottom: 5 }} />
+        )
+    }
+
+    const navigation = useNavigation<any>()
+    const [modalVisible, setModalVisible] = useState(false)
+
     return (
         <View style={styles.container}>
             <View style={{ flex: 0.05 }} />
+            <TouchableOpacity onPress={() => navigation.navigate('ThreadsSettings')}
+                style={{ alignSelf: 'flex-end', marginHorizontal: 30, marginVertical: 10, }}>
+                <Icon name='align-right' size={20} color='black' />
+            </TouchableOpacity>
+
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginHorizontal: 20, alignItems: 'center' }}>
                 <View>
-                    <Text style={styles.originalName}>OrignalName</Text>
-                    <Text style={styles.userName}>Original_Name</Text>
+                    <Text style={styles.originalName}>{data?.username}</Text>
+                    <Text style={styles.userName}>{data?.email}</Text>
                 </View>
-                <Icon name='person-circle' size={60} color='grey' />
+                {!data?.selectedImage ? <Icon2 name='person-circle' size={60} color='grey' /> :
+                    <Image source={{ uri: data?.selectedImage }} style={{ height: 50, width: 50, borderRadius: 25 }} />
+                }
             </View>
 
             <View style={{ flex: 0.02 }} />
 
             <View style={styles.detailContainer}>
-                <Text style={{ color: '#616a6b', fontFamily: 'Nunito-Regular' }}>Formula 1 Driver for Scudera Ferrari</Text>
+                <Text style={{ color: '#616a6b', fontFamily: 'Nunito-Regular' }}>{data?.bio}</Text>
                 <Text style={{ color: '#cacfd2', fontFamily: 'Nunito-Regular' }}>3 Followers</Text>
             </View>
 
             <View style={{ flex: 0.05 }} />
 
-
             <View style={styles.buttonContainer}>
-                <TouchableOpacity
+                <TouchableOpacity onPress={() =>
+                    setModalVisible(true)
+                }
                     style={[styles.button, { backgroundColor: 'white' }]}>
                     <Text style={[styles.buttonText,]}>Edit Profile</Text>
                 </TouchableOpacity>
-
                 <TouchableOpacity
                     style={[styles.button, { backgroundColor: 'white' }]}>
-                    <Text style={[styles.buttonText,]}>Save Profile</Text>
+                    <Text style={[styles.buttonText,]}>Share Profile</Text>
                 </TouchableOpacity>
             </View>
+
+
+
+
+            <Modal
+                visible={modalVisible}
+                onRequestClose={() => setModalVisible(false)}
+                animationType='slide'
+            >
+
+                <View style={styles.headerContainer}>
+                    <TouchableOpacity onPress={() => setModalVisible(false)}
+                    >
+                        <Text style={styles.sideHeaders}>Cancel</Text>
+                    </TouchableOpacity>
+                    <Text style={styles.header}>Edit Profile</Text>
+                    <TouchableOpacity onPress={() => {
+                        updateProfile();
+                        setModalVisible(false)
+                    }}>
+                        <Text style={[styles.sideHeaders, { fontFamily: 'Nunito-Black' }]}>Done</Text>
+                    </TouchableOpacity>
+                </View>
+
+                <View style={{ backgroundColor: '#d7dbdd', flex: 1 }}>
+                    <View style={{ flex: 0.3 }} />
+
+                    <View style={styles.settingContainer}>
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                            <View>
+                                <Text style={[styles.title, { marginLeft: 15 }]}>Name</Text>
+                                <TextInput style={[styles.textInput1, { marginLeft: 10 }]}
+                                    value={data?.username} onChangeText={(Text) => setUserName(Text)}
+                                    placeholder='Name' placeholderTextColor='grey' maxLength={20}
+                                />
+                            </View>
+                            <TouchableOpacity onPress={openImagePicker}
+                                style={{ position: 'absolute', right: 10, top: -10 }}>
+                                {!data?.selectedImage ? <Icon2 name='person-circle' size={60} color='grey' /> :
+                                    <Image source={{ uri: data?.selectedImage }} style={{ height: 50, width: 50, borderRadius: 25 }} />
+                                }
+                            </TouchableOpacity>
+                        </View>
+
+                        <Line width='80%' />
+
+                        <Text style={[styles.title, { marginLeft: 15 }]}>Bio</Text>
+                        <TextInput style={[styles.textInput, { marginLeft: 10 }]}
+                            value={data?.bio} onChangeText={(Text) => setBio(Text)}
+                            placeholder='Bio here' placeholderTextColor='grey' maxLength={20}
+                        />
+
+                        <Line width='90%' />
+
+                        <Text style={[styles.title, { marginLeft: 15 }]}>Link</Text>
+                        <TextInput style={[styles.textInput, { marginLeft: 10 }]}
+                            placeholder='Create Link' placeholderTextColor='grey' maxLength={20}
+                        />
+                    </View>
+
+                </View>
+            </Modal>
 
 
             <View style={{ alignItems: 'center', }}>
@@ -45,6 +225,7 @@ const ThreadsProfile = () => {
                     Threads
                 </Text>
             </View>
+
         </View >
     )
 }
@@ -107,5 +288,57 @@ const styles = StyleSheet.create({
         paddingHorizontal: 30,
         borderBottomWidth: 1.5,
     },
-
+    headerContainer: {
+        // backgroundColor:'orange',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'flex-end',
+        marginHorizontal: 20,
+        marginVertical: 10,
+    },
+    header: {
+        color: 'black',
+        fontFamily: 'Raleway-Bold',
+        fontSize: 22,
+    },
+    sideHeaders: {
+        // backgroundColor: 'purple',
+        color: 'grey',
+        fontFamily: 'Nunito-Bold',
+        fontSize: 18
+    },
+    title: {
+        fontFamily: 'Nunito-Bold',
+        fontSize: 17,
+        color: 'black',
+        marginLeft: 30,
+    },
+    textInput: {
+        // backgroundColor: 'red',
+        // width: '80%',
+        paddingVertical: 0,
+        paddingHorizontal: 8,
+        fontFamily: 'Nunito-Bold',
+        fontSize: 17,
+        color: 'grey',
+    },
+    textInput1: {
+        // backgroundColor: 'red',
+        width: '390%',
+        paddingVertical: 0,
+        paddingHorizontal: 8,
+        fontFamily: 'Nunito-Bold',
+        fontSize: 17,
+        color: 'grey',
+    },
+    settingContainer: {
+        marginHorizontal: 20,
+        justifyContent: 'center',
+        backgroundColor: 'white',
+        borderRadius: 10,
+        borderWidth: 1,
+        borderColor: 'grey',
+        elevation: 10,
+        paddingVertical: 20,
+    }
 })

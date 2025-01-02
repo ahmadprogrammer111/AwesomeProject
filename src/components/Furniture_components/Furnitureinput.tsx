@@ -11,10 +11,10 @@ const Furnitureinput = (Props: any) => {
 
             <Text style={styles.header}>{name}</Text>
             <View style={styles.textinputcontainer}>
-                <TextInput value={text} onChangeText={onChangeText} 
-                style={styles.textinput} placeholder={placeholder} placeholderTextColor='#838383' />
+                <TextInput value={text} onChangeText={onChangeText}
+                    style={styles.textinput} placeholder={placeholder} placeholderTextColor='#838383' />
             </View>
-            
+
         </View>
     )
 }

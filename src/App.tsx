@@ -60,6 +60,11 @@ import ThreadsActivity from './views/screens/ThreadsApp/ThreadsFeed.tsx'
 import ThreadsFeed from './views/screens/ThreadsApp/ThreadsFeed.tsx'
 import ThreadsProfile from './views/screens/ThreadsApp/ThreadsProfile.tsx'
 
+import ThreadsLogin from './views/screens/ThreadsApp/ThreadsLogin.tsx'
+import ThreadsSignUp from './views/screens/ThreadsApp/ThreadsSignUp.tsx'
+import ThreadsForgotPass from './views/screens/ThreadsApp/ThreadsForgotPass.tsx'
+import ThreadsSplash from './views/screens/ThreadsApp/ThreadsSplash.tsx'
+import ThreadsSettings from './views/screens/ThreadsApp/ThreadsSettings.tsx'
 
 
 
@@ -221,12 +226,17 @@ const App = () => {
 
 
 
-   const DrawerNavigator = createDrawerNavigator({
+
+
+
+   const stack2 = createNativeStackNavigator({
       screens: {
          ThreadsProfile: ThreadsProfile,
+         ThreadsSettings: ThreadsSettings
       },
       screenOptions: {
          headerShown: false,
+         // animation:'slide_from_right'
       }
    })
 
@@ -262,7 +272,7 @@ const App = () => {
             }
          },
          ThreadsProfile1: {
-            screen: DrawerNavigator, options: {
+            screen: stack2, options: {
                // headerShown: true,
                // headerTitle: "",
                // headerShadowVisible: false,
@@ -290,6 +300,33 @@ const App = () => {
    })
 
 
+   const MainStack = createNativeStackNavigator({
+      screens: {
+         ThreadsSplash: ThreadsSplash,
+         ThreadsLogin: ThreadsLogin,
+         ThreadsSignUp: ThreadsSignUp,
+         ThreadsForgotPass: ThreadsForgotPass,
+         ThreadsHome1: BottomNavigator
+      },
+      screenOptions: {
+         headerShown: false,
+      }
+   })
+
+
+   // const EditProfileStack = createNativeStackNavigator({
+   //    screens: {
+   //       ThreadsProfile1: ThreadsProfile,
+
+   //    },
+   //    screenOptions: {
+   //       headerShown: false,
+   //    }
+   // })
+
+
+
+
    OneSignal.Debug.setLogLevel(LogLevel.Verbose);
 
    // OneSignal Initialization
@@ -309,7 +346,7 @@ const App = () => {
 
 
 
-   const Navigation = createStaticNavigation(BottomNavigator)
+   const Navigation = createStaticNavigation(MainStack)
    return (
       <Provider store={store}>
 
