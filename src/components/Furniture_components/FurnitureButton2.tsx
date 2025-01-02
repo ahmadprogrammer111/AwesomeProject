@@ -3,9 +3,10 @@ import React from 'react'
 import Icon from 'react-native-vector-icons/FontAwesome5'
 // import Icon
 const FurnitureButton2 = (Props: any) => {
-    const { Iconname, Iconcolor, name, bgcolor, screen, textcolor } = Props
+    const { Iconname, name, screen, } = Props
     return (
         <View>
+
             <TouchableOpacity style={[styles.button, { backgroundColor: 'white', }]} onPress={screen}>
                 
                 <Icon name={Iconname} size={20} color='#3498db' />

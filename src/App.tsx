@@ -47,6 +47,11 @@ import HomeScreen from './views/screens/ShoppingApp/HomeScreen.tsx'
 import CartScreen from './views/screens/ShoppingApp/CartScreen.tsx'
 import { Provider, useSelector } from 'react-redux'
 import store from './redux/store.tsx'
+import { PersistGate } from 'redux-persist/integration/react'
+import { persistStore } from 'redux-persist'
+
+
+
 import Contactdetailscreen2 from './views/screens/ContactScreens2/Contactdetailscreen2.tsx'
 import Contactaddscreen2 from './views/screens/ContactScreens2/Contactaddscreen2.tsx'
 import Contactlistscreen2 from './views/screens/ContactScreens2/Contactlistscreen2.tsx'
@@ -74,6 +79,8 @@ import ThreadsSettings from './views/screens/ThreadsApp/ThreadsSettings.tsx'
 
 const App = () => {
 
+
+   const persistor = persistStore(store)
 
    // const bottomNavigator = createBottomTabNavigator({
 
@@ -245,6 +252,7 @@ const App = () => {
       screens: {
          ThreadsHome: {
             screen: ThreadsHome, options: {
+
                tabBarButton: (props) => (<RemoveRippleEffect {...props} />
                ),
                tabBarIcon: ({ color }) => <Icon6 name='home' color={color} size={30} />
@@ -349,9 +357,9 @@ const App = () => {
    const Navigation = createStaticNavigation(MainStack)
    return (
       <Provider store={store}>
-
-         <Navigation />
-
+         <PersistGate loading={null} persistor={persistor}>
+            <Navigation />
+         </PersistGate>
       </Provider>
    )
 }

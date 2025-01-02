@@ -1,15 +1,10 @@
 import { ActivityIndicator, StyleSheet, Text, View, TouchableOpacity } from 'react-native'
 import React, { useState } from 'react'
 import { useNavigation } from '@react-navigation/native'
-
-
-
 import Icon from 'react-native-vector-icons/Feather'
 import Icon2 from 'react-native-vector-icons/MaterialCommunityIcons'
 import Icon3 from 'react-native-vector-icons/Ionicons'
-
 import auth from '@react-native-firebase/auth'
-
 
 
 const ThreadsSettings = () => {
@@ -18,7 +13,6 @@ const ThreadsSettings = () => {
     const navigation = useNavigation<any>()
 
     const signOut = () => {
-
         auth()
             .signOut()
             .then(() => {
@@ -26,8 +20,7 @@ const ThreadsSettings = () => {
                 setIsLoading(false)
                 navigation.navigate('ThreadsLogin')
             });
-
-        // console.log('loading value', isLoading)
+        // console.log('loading value', isLoading) 
     }
     return (
         <View style={styles.container}>

@@ -3,30 +3,68 @@ import React, { useState } from 'react'
 import Furnitureinput from '../../../components/Furniture_components/Furnitureinput'
 import ThreadsInput from '../../../components/ThreadsComponents/ThreadsInput'
 import { useNavigation } from '@react-navigation/native'
-import auth from '@react-native-firebase/auth';
+import auth from '@react-native-firebase/auth'
+import FurnitureButton2 from '../../../components/Furniture_components/FurnitureButton2'
+
+import { useDispatch } from 'react-redux'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { addEmail } from '../../../redux/Slices/userSlice'
 
 
 const ThreadsLogin = () => {
 
+
+    const dispatch = useDispatch()
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
-
     const navigation = useNavigation<any>()
 
-    const createUserWithEmailAndPassword = async () => {
+
+
+
+    const storingEmail = async (email: any) => {
+        try {
+            console.log('storing Email in async,', email)
+            await AsyncStorage.setItem('EMAIL', email)
+            console.log('Your Value Stored')
+        } catch (error) {
+            console.log('error storing your data in asyncstorage')
+        }
+    }
+
+
+
+    const signinwithEmailAndPassword = async () => {
+
         console.log('Email:', email);
         console.log('Password:', password);
         if (!email || !password) {
             console.log('Email or Password is empty');
             return Alert.alert('Email or Password is empty')
-
+        }
+        const Email = () => {
+            dispatch(addEmail(email))
+    
         }
 
         auth()
             .signInWithEmailAndPassword(email, password)
             .then(() => {
-                console.log('User signed sucessfully')
-                navigation.navigate('ThreadsHome1' as never)
+                Email()
+                console.log('storing Email in async,', email)
+            
+                storingEmail(email)
+
+                console.log('User Logged In! sucessfully')
+                // console.log('Navigating to ThreadsHome1 with email:', email);
+                navigation.navigate('ThreadsHome1',)
+
+
+
+                //      {
+                //     screen: 'ThreadsHome',
+                //     params: { email: email }
+                // }
             })
             .catch((error) => {
                 if (error.code == 'auth/email-already-in-use') {
@@ -40,7 +78,10 @@ const ThreadsLogin = () => {
                 }
                 console.log(error)
             })
+
     }
+
+
 
 
     return (
@@ -64,12 +105,17 @@ const ThreadsLogin = () => {
             <TouchableOpacity onPress={() => navigation.navigate('ThreadsForgotPass')}>
                 <Text style={styles.forgotPass}>Forgot Password</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={createUserWithEmailAndPassword}
+            <TouchableOpacity onPress={signinwithEmailAndPassword}
                 style={styles.button}>
                 <Text style={styles.buttonText}>Login</Text>
             </TouchableOpacity>
 
             <View style={{ height: '1%' }} />
+            <FurnitureButton2 name='Sign in with Google' Iconname='google' />
+            <FurnitureButton2 name='Sign in with Facebook' Iconname='facebook' />
+
+
+
 
             <View style={styles.lineContainer}>
                 <View style={styles.line} />
@@ -96,7 +142,6 @@ const ThreadsLogin = () => {
                 <Image source={require('../../../assets/images/Meta.png')} style={styles.metaLogo} />
                 <Text style={styles.meta}>Meta</Text>
             </View>
-
 
 
 
@@ -132,8 +177,8 @@ const styles = StyleSheet.create({
     },
     threadsLogoContainer: {
         justifyContent: 'center',
-        width: '55%',
-        height: '25%',
+        width: '45%',
+        height: '20%',
         alignSelf: 'center'
     },
     logo: {

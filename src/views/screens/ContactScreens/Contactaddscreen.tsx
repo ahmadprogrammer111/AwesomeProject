@@ -106,7 +106,7 @@ const Contactaddscreen = ({ route }: any) => {
          await AsyncStorage.setItem('Contacts', jsonvalue)
          console.log('your value stored')
       } catch (error) {
-         console.log('Error', error)
+         console.log('Error in storing in asyncstorage', error)
       }
    }
 

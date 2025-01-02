@@ -61,7 +61,7 @@ export default ThreadsForgotPass
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#edf4fe'
+        backgroundColor: 'white'
     },
     iconContainer: {
         // width: '30%',

@@ -1,11 +1,54 @@
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import React, { useState } from 'react'
 import Icon from 'react-native-vector-icons/Ionicons'
+import { useSelector } from 'react-redux'
+import firestore from '@react-native-firebase/firestore'
+import { useNavigation } from '@react-navigation/native'
+
+
+
+
+
 const ThreadsCreate = () => {
+    const navigation = useNavigation<any>()
+
+    const email = useSelector((state: any) => state.user.tempMail)
+
+    if (email) {
+        console.log('Email from redux store', email)
+    } else {
+        console.log('No Email  from redux store')
+    }
+    const [thread, setThread] = useState('')
+ 
+    console.log('My thread:::', thread)
+
+    
+    const createThread = async () => {
+        try {
+            await
+                firestore()
+                    .collection('Threads')
+                    .doc('userThreads')
+                    .update({
+                        threads: firestore.FieldValue.arrayUnion({
+                            thread
+                        })
+                    });
+            setThread('')
+            console.log(' Created thread')
+            navigation.navigate('ThreadsHome')
+        } catch (error) {
+            console.log('error Creating thread', error)
+        }
+
+    }
+
+
+
+
     const [length, setLength] = useState(30)
-
     const Line = () => {
-
         return (
             <View style={[styles.line, { height: length, }]} />
         )
@@ -14,11 +57,14 @@ const ThreadsCreate = () => {
     return (
         <View style={styles.container}>
             <View style={styles.headerContainer}>
-                <TouchableOpacity>
+                <TouchableOpacity onPress={() => navigation.goBack()}>
                     <Text style={styles.sideHeaders}>Cancel</Text>
                 </TouchableOpacity>
                 <Text style={styles.header}>New Thread</Text>
-                <TouchableOpacity>
+                <TouchableOpacity onPress={() => {
+                    createThread();
+
+                }}>
                     <Text style={styles.sideHeaders}>Post</Text>
                 </TouchableOpacity>
             </View>
@@ -33,8 +79,9 @@ const ThreadsCreate = () => {
                 <View style={styles.threadTextContainer}>
                     <Text style={styles.userName}>Username</Text>
                     <TextInput
-
+                        value={thread}
                         onChangeText={(text) => {
+                            setThread(text)
                             Line()
                             text.length > 30 && setLength(text.length / 1.6)
                         }}
@@ -102,7 +149,7 @@ const styles = StyleSheet.create({
         fontFamily: 'Nunito-Regular',
         // paddingVertical: 10
     },
-    userName: { 
+    userName: {
         color: 'black',
         fontFamily: 'Nunito-Bold',
         fontSize: 18,
