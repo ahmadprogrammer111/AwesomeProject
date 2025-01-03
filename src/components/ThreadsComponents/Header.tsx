@@ -3,16 +3,18 @@ import React from 'react'
 import Icon from 'react-native-vector-icons/Ionicons'
 import Icon2 from 'react-native-vector-icons/FontAwesome6'
 import Icon3 from 'react-native-vector-icons/AntDesign'
+import { useNavigation } from '@react-navigation/native'
 
-const Header = () => {
-
+const Header = (props: any) => {
+    const { screen } = props
+    const navigation = useNavigation<any>()
     return (
         <View style={styles.container}>
-            <TouchableOpacity style={styles.backContainer}>
+            <TouchableOpacity style={styles.backContainer} onPress={() => navigation.navigate(`${screen}`)}>
                 <Icon name='caret-back-sharp' size={22} color='black' style={styles.backIcon} />
                 <Text style={styles.backText}>Back</Text>
             </TouchableOpacity>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '23%' , marginTop: 7.5}}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '23%', marginTop: 7.5 }}>
                 <TouchableOpacity>
                     <Icon3 name='instagram' size={30} color='black' />
                 </TouchableOpacity>

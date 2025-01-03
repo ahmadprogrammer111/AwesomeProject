@@ -247,12 +247,26 @@ const App = () => {
       }
    })
 
+
+
+   const stack3 = createNativeStackNavigator({
+      screens: {
+         ThreadsHome2: ThreadsHome,
+         ThreadsDetails: ThreadsDetails
+      },
+      screenOptions: {
+         headerShown: false,
+         
+         // animation:'slide_from_right'
+      }
+   })
+
    const BottomNavigator = createBottomTabNavigator({
 
       screens: {
          ThreadsHome: {
-            screen: ThreadsHome, options: {
-
+            screen: stack3, options: {
+               
                tabBarButton: (props) => (<RemoveRippleEffect {...props} />
                ),
                tabBarIcon: ({ color }) => <Icon6 name='home' color={color} size={30} />

@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import firestore from '@react-native-firebase/firestore'
 import { launchImageLibrary } from 'react-native-image-picker'
-import { addEmail } from '../../../redux/Slices/userSlice'
+import { addEmail, addUser } from '../../../redux/Slices/userSlice'
 
 
 
@@ -15,13 +15,31 @@ import { addEmail } from '../../../redux/Slices/userSlice'
 
 const ThreadsProfile = () => {
 
+    const dispatch = useDispatch()
+    const user = useSelector((state: any) => state.user.user)
+    const Email = useSelector((state: any) => state.user.tempMail)
+
 
     const [data, setData] = useState<any>()
     const [email, setEmail] = useState('')
 
 
+    useEffect(() => {
 
- 
+        if (user) {
+            console.log('user from redux', user)
+            setData(user)
+        }
+        if (Email) {
+            console.log('user from redux', Email)
+            setEmail(Email)
+        }
+
+    }, [])
+
+
+
+
     const openImagePicker = () => {
         const options: any = {
             mediaType: 'photo',
@@ -44,7 +62,6 @@ const ThreadsProfile = () => {
     };
 
 
-    const Email = useSelector((state: any) => state.user.tempMail)
 
 
     const setUserName = (Value: string) => {
@@ -56,38 +73,7 @@ const ThreadsProfile = () => {
         console.log(' Edited Bio:', data?.bio)
     }
 
-    useEffect(() => {
-        const getStoredEmail = async () => {
-            try {
-                if (Email) {
-                    console.log('Email getting from redux: ', email)
-                } else {
-                    console.log('No Email from redux')
-                }
-                setEmail(Email)
-                console.log('Email!! from redux store', Email)
 
-                if (Email) {
-                    const subscriber = firestore()
-                        .collection('Users')
-                        .where('email', '==', Email)
-                        .onSnapshot(documentSnapshot => {
-                            console.log('User data: ', documentSnapshot.docs[0].data())
-                            const userData = documentSnapshot.docs[0].data()
-                            setData(userData)
-                        })
-                    return () => subscriber();
-                } else {
-                    console.log('from profile screenThere is no value in Email: ', Email)
-                }
-
-            } catch (error) {
-                console.log('Err fetching Email from redux-persist', error)
-            }
-        }
-        getStoredEmail()
-
-    }, [])
 
 
 
@@ -101,7 +87,8 @@ const ThreadsProfile = () => {
                 selectedImage: data?.selectedImage,
             })
             .then(() => {
-                console.log(`User with Email:  ${email}  updated!`);
+                dispatch(addUser(data))
+                console.log(`User with Email:  ${email}  updated on    f i r e  store and   R e d u x  !`);
             });
     }
 

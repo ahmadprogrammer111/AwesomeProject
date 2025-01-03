@@ -15,7 +15,7 @@ const ThreadsCreateIcon = (Props: any) => {
             <TouchableOpacity onPressIn={() => setIsPressed(true)} onPressOut={() => setIsPressed(false)}
                 onPress={() => navigation.navigate('ThreadsCreate')}
             >
-                <Icon name='plus' size={40} color={color} style={styles.icon} />
+                <Icon name='plus' size={30} color={color} style={styles.icon} />
             </TouchableOpacity>
         </View>
 
@@ -27,10 +27,10 @@ export default ThreadsCreateIcon
 const styles = StyleSheet.create({
     container: {
         // flex: 1,
-        marginBottom: 30,
+        marginBottom: 20,
         backgroundColor: 'white',
-        height: 70,
-        width: 70,
+        height: 60,
+        width: 60,
         borderRadius: 40,
         // borderColor: '#eaeded',
         borderWidth: 3,

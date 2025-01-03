@@ -11,38 +11,64 @@ import { useNavigation } from '@react-navigation/native'
 
 const ThreadsCreate = () => {
     const navigation = useNavigation<any>()
+    const user = useSelector((state: any) => state.user.user)
+    const Email = useSelector((state: any) => state.user.tempMail)
 
-    const email = useSelector((state: any) => state.user.tempMail)
 
-    if (email) {
-        console.log('Email from redux store', email)
+    if (Email) {
+        console.log('Email from redux store', Email)
     } else {
         console.log('No Email  from redux store')
     }
     const [thread, setThread] = useState('')
- 
+
     console.log('My thread:::', thread)
 
-    
+
     const createThread = async () => {
         try {
             await
                 firestore()
                     .collection('Threads')
-                    .doc('userThreads')
-                    .update({
-                        threads: firestore.FieldValue.arrayUnion({
-                            thread
-                        })
-                    });
+                    // .doc(Email)
+                    .add({
+                        thread: thread,
+                        email: Email,
+                        username: user.username,
+                        bio: user.bio,
+                        createdAt: firestore.FieldValue.serverTimestamp()
+                    })
+
             setThread('')
             console.log(' Created thread')
             navigation.navigate('ThreadsHome')
         } catch (error) {
             console.log('error Creating thread', error)
         }
-
     }
+    // try {
+    //     await
+    //         firestore()
+    //             .collection('allThreads')
+    //             .doc(Email)
+    //             .set({
+    //                 post: firestore.FieldValue.arrayUnion({
+    //                     thread,
+    //                 }),
+    //                 // email: Email,
+    //                 // username: user.username,
+    //                 // bio: user.bio,
+    //                 createdAt: firestore.FieldValue.serverTimestamp()
+    //             })
+
+    //     setThread('')
+    //     console.log(' Created thread')
+    //     navigation.navigate('ThreadsHome')
+    // } catch (error) {
+    //     console.log('error Creating thread', error)
+    // }
+
+    // }
 
 
 
@@ -77,7 +103,7 @@ const ThreadsCreate = () => {
                     <Line />
                 </View>
                 <View style={styles.threadTextContainer}>
-                    <Text style={styles.userName}>Username</Text>
+                    <Text style={styles.userName}>{user.username}</Text>
                     <TextInput
                         value={thread}
                         onChangeText={(text) => {
