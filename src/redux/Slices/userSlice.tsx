@@ -19,7 +19,6 @@ const userSlice = createSlice({
         },
         addEmail: (state, action) => {
             if (state.tempMail !== action.payload) {
-
                 console.log(`Your ${action.payload} is nulled in redux store,`, state.tempMail)
                 state.tempMail = ''
             }

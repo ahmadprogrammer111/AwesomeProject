@@ -1,13 +1,16 @@
-import { Modal, StyleSheet, Text, TouchableOpacity, View, TextInput, Image } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import { Modal, StyleSheet, Text, TouchableOpacity, View, TextInput, Image, FlatList } from 'react-native'
+import React, { useCallback, useEffect, useState } from 'react'
 import Icon from 'react-native-vector-icons/FontAwesome'
 import Icon2 from 'react-native-vector-icons/Ionicons'
-import { DrawerActions, useNavigation } from '@react-navigation/native'
+import { DrawerActions, useFocusEffect, useNavigation } from '@react-navigation/native'
 import { useDispatch, useSelector } from 'react-redux'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import firestore from '@react-native-firebase/firestore'
 import { launchImageLibrary } from 'react-native-image-picker'
 import { addEmail, addUser } from '../../../redux/Slices/userSlice'
+import Icon3 from 'react-native-vector-icons/Ionicons'
+import Icon4 from 'react-native-vector-icons/Feather'
+import Icon5 from 'react-native-vector-icons/FontAwesome'
 
 
 
@@ -15,27 +18,69 @@ import { addEmail, addUser } from '../../../redux/Slices/userSlice'
 
 const ThreadsProfile = () => {
 
+    const navigation = useNavigation<any>()
+    const [modalVisible, setModalVisible] = useState(false)
+
+
     const dispatch = useDispatch()
-    const user = useSelector((state: any) => state.user.user)
+    // const user = useSelector((state: any) => state.user.user)
     const Email = useSelector((state: any) => state.user.tempMail)
 
 
     const [data, setData] = useState<any>()
     const [email, setEmail] = useState('')
+    const [myThreads, setMyThreads] = useState<any>()
+
+    // useEffect(() => {
 
 
-    useEffect(() => {
+    //     if (user) {
+    //         console.log('modifying the userdata : ', user.post.map((item: any) => item))
+    //         const tempThreads = user.post.map((item: any) => item)
+    //         setMyThreads(tempThreads)
+    //     }
+    //     if (user) {
+    //         console.log('user from redux', user)
+    //         setData(user)
+    //     }
+    //     if (Email) {
+    //         console.log('user from redux', Email)
+    //         setEmail(Email)
+    //     }
 
-        if (user) {
-            console.log('user from redux', user)
-            setData(user)
+    // }, [])
+
+    useFocusEffect(useCallback(
+        () => {
+
+        try {
+            if (Email) {
+                const subscriber = firestore()
+                    .collection('Threads')
+                    .where('email', '==', Email)
+                    .onSnapshot(documentSnapshot => {
+                        console.log('Threads: ', documentSnapshot.docs)
+                        const threadsArray = documentSnapshot.docs.map(item => item.data())
+                        if (threadsArray) {
+                            console.log('my array', threadsArray)
+                            setMyThreads(threadsArray)
+                        }
+
+                    })
+                return () => subscriber();
+            } else {
+                console.log('from Homescreen. There is no value in Email: ', Email)
+            }
+
+        } catch (error) {
+            console.log('Err fetching Email from redux-persist', error)
         }
-        if (Email) {
-            console.log('user from redux', Email)
-            setEmail(Email)
-        }
+        // }
+        // getStoredEmail()
 
-    }, [])
+    },
+    [],
+))
 
 
 
@@ -73,10 +118,6 @@ const ThreadsProfile = () => {
         console.log(' Edited Bio:', data?.bio)
     }
 
-
-
-
-
     const updateProfile = () => {
         firestore()
             .collection('Users')
@@ -84,16 +125,13 @@ const ThreadsProfile = () => {
             .update({
                 username: data?.username,
                 bio: data?.bio,
-                selectedImage: data?.selectedImage,
+                // selectedImage: data?.selectedImage,
             })
             .then(() => {
                 dispatch(addUser(data))
                 console.log(`User with Email:  ${email}  updated on    f i r e  store and   R e d u x  !`);
             });
     }
-
-
-
     const Line = (props: any) => {
         const { width } = props
         return (
@@ -101,8 +139,47 @@ const ThreadsProfile = () => {
         )
     }
 
-    const navigation = useNavigation<any>()
-    const [modalVisible, setModalVisible] = useState(false)
+
+
+
+    const renderContacts = ({ item }: any) => {
+
+        // console.log(item)f
+
+        return (<View style={{}}>
+            <TouchableOpacity
+                // onPress={() => navigation.navigate('ThreadsDetails', { user: item })} */}
+                style={styles.main}>
+                <Icon3 name='person-circle' size={50} color='grey' />
+                <View style={styles.submain}>
+                    <View style={styles.textContainer}>
+                        <Text style={styles.userName}>{item.username}</Text>
+                        <Text style={styles.text}>{item.thread}</Text>
+                    </View>
+                    <Icon4 name='more-horizontal' size={22} color='black' />
+                </View>
+            </TouchableOpacity>
+
+            <View style={styles.icons}>
+
+                <TouchableOpacity>
+                    <Icon4 name='heart' size={22} color='black' />
+                </TouchableOpacity>
+
+                <TouchableOpacity >
+                    <Icon5 name='comment-o' size={22} color='black' />
+                </TouchableOpacity >
+
+                <TouchableOpacity >
+                    <Icon3 name='paper-plane-outline' size={22} color='black' />
+                </TouchableOpacity>
+
+            </View >
+            <View style={styles.hline} />
+        </View >)
+    }
+
+
 
     return (
         <View style={styles.container}>
@@ -212,6 +289,17 @@ const ThreadsProfile = () => {
                     Threads
                 </Text>
             </View>
+
+            
+            {myThreads ? (
+                <FlatList
+                    data={myThreads}
+                    renderItem={renderContacts}
+                    style={{ marginTop: 30 }}
+                />
+            ) : (
+                <Text style={{ textAlign: 'center', marginVertical: 20, color: 'black' }}>Loading threads...</Text>
+            )}
 
         </View >
     )
@@ -327,5 +415,43 @@ const styles = StyleSheet.create({
         borderColor: 'grey',
         elevation: 10,
         paddingVertical: 20,
-    }
+    },
+    main: {
+        flexDirection: 'row',
+        marginHorizontal: 20,
+        marginBottom: 5
+    },
+    submain: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        // backgroundColor: 'red',
+        width: '80%'
+    },
+    textContainer: {
+        marginLeft: 6,
+        // backgroundColor: '20',
+        width: '90%'
+    },
+    hline: {
+        height: 1,
+        width: '100%',
+        backgroundColor: '#d7dbdd',
+        marginVertical: 15
+    },
+    icons: {
+        // backgroundColor: 'red',
+        width: '50%',
+        flexDirection: 'row',
+        marginLeft: '19%',
+        // alignSelf: 'center',
+        // marginRight: 35,
+        gap: 20,
+    },
+    text: {
+        // width: '100%',
+        color: 'grey',
+        fontSize: 16,
+        fontFamily: 'Nunito-Medium',
+    },
+
 })

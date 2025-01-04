@@ -40,8 +40,7 @@ const ThreadsSignUp = () => {
             return setIsLoading(false)
 
         }
-        Email()        
-     
+        Email()
 
         Auth()
             .createUserWithEmailAndPassword(email, password)
@@ -56,6 +55,7 @@ const ThreadsSignUp = () => {
                         password: password,
                         bio: bio,
                         selectedImage: selectedImage,
+                        post: []
                     });
                 // firestore()
                 //     .collection('Threads')

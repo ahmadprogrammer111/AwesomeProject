@@ -19,29 +19,40 @@ const ThreadsDetails = ({ route }: any) => {
 
     const [data, setData] = useState<any>()
 
-    const [userThreads, setUserThreads] = useState<any>()
 
-    // const user = useSelector((state: any) => state.user.user)
+    const [usersInfo, setUsersInfo] = useState<any>()
+    const [ThreadsArray, setThreadsArray] = useState<any>()
+
 
     useEffect(() => {
 
+        getData()
+
+    }, [])
+
+
+    const getData = async () => {
         if (user) {
             console.log('user from props', user)
-            setData(user)
+            // setData(user)
         } else {
             console.error('No user from redux', Error)
-
         }
         try {
             if (user?.email) {
                 const subscriber = firestore()
-                    .collection('Threads')
-                    .where('email', '==', user.email)
+                    .collection('Users')
+                    .where('email', '==', user?.email)
                     .onSnapshot(documentSnapshot => {
-                        const Threads = documentSnapshot.docs.map((item: any) => item.data())
+                        console.log('My array on detail screen', documentSnapshot?.docs?.map((item: any) => item.data()))
+                        const Threads: any = documentSnapshot?.docs?.map((item: any) => item.data())
+
                         if (Threads) {
                             console.log('my array', JSON.stringify(Threads))
-                            setUserThreads(Threads)
+                            console.log('Only Threads', Threads[0]?.post?.map((item: any) => item))
+                            const post = Threads[0].post?.map((item: any) => item)
+                            setData(Threads)
+                            setThreadsArray(post)
                         }
 
                     })
@@ -54,43 +65,42 @@ const ThreadsDetails = ({ route }: any) => {
             console.log('Err fetching Email from redux-persist', error)
         }
 
-    }, [])
-
+    }
 
     const renderContacts = ({ item }: any) => {
 
-        console.log(item)
+        // console.log(item)f
 
         return (<View style={{}}>
             <TouchableOpacity
                 // onPress={() => navigation.navigate('ThreadsDetails', { user: item })} */}
                 style={styles.main}>
-                <Icon name='person-circle' size={50} color='grey' />
+                <Icon3 name='person-circle' size={50} color='grey' />
                 <View style={styles.submain}>
                     <View style={styles.textContainer}>
-                        <Text style={styles.userName}>{item.username}</Text>
-                        <Text style={styles.text}>{item.thread}</Text>
+                        <Text style={styles.userName}>{data[0]?.username}</Text>
+                        <Text style={styles.text}>{item}</Text>
                     </View>
-                    <Icon2 name='more-horizontal' size={22} color='black' />
+                    <Icon4 name='more-horizontal' size={22} color='black' />
                 </View>
             </TouchableOpacity>
-            <View style={styles.icons}>
-                <TouchableOpacity>
 
-                    <Icon2 name='heart' size={22} color='black' />
+            <View style={styles.icons}>
+
+                <TouchableOpacity>
+                    <Icon4 name='heart' size={22} color='black' />
                 </TouchableOpacity>
 
                 <TouchableOpacity >
-
-                    <Icon3 name='comment-o' size={22} color='black' />
+                    <Icon5 name='comment-o' size={22} color='black' />
                 </TouchableOpacity >
-                <TouchableOpacity >
 
-                    <Icon name='paper-plane-outline' size={22} color='black' />
+                <TouchableOpacity >
+                    <Icon3 name='paper-plane-outline' size={22} color='black' />
                 </TouchableOpacity>
 
             </View >
-            <View style={styles.line} />
+            <View style={styles.hline} />
         </View >)
     }
 
@@ -98,31 +108,27 @@ const ThreadsDetails = ({ route }: any) => {
     return (
         <View style={styles.container}>
 
-
             <Header screen='ThreadsHome2' />
             <View>
-                {/* <Text style={styles.threads}>
+                <Text style={styles.threads}>
                     Threads
-                </Text> */}
+                </Text>
 
                 <View style={{ flex: 0.05 }} />
 
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginHorizontal: 20, alignItems: 'center' }}>
                     <View>
-                        <Text style={styles.originalName}>{data?.username}</Text>
-                        <Text style={styles.userName}>{data?.email}</Text>
+                        <Text style={styles.originalName}>{data?.[0]?.username ?? 'Loading...'}</Text>
+                        <Text style={styles.userName}>{data?.[0]?.email ?? 'Loading...'}</Text>
                     </View>
-                    {/* {!data?.selectedImage ? */}
+
                     <Icon2 name='person-circle' size={60} color='grey' />
-                    {/* //   : */}
-                    {/* // <Image source={{ uri: data?.selectedImage }} style={{ height: 50, width: 50, borderRadius: 25 }} /> */}
-                    {/* // }/ */}
                 </View>
 
-                {/* <View style={{ flex: 0.02 }} /> */}
+
 
                 <View style={styles.detailContainer}>
-                    <Text style={{ color: '#616a6b', fontFamily: 'Nunito-Regular' }}>{data?.bio}</Text>
+                    <Text style={{ color: '#616a6b', fontFamily: 'Nunito-Regular' }}>{data?.[0]?.bio ?? 'Loading bio...'} </Text>
                     <Text style={{ color: '#cacfd2', fontFamily: 'Nunito-Regular' }}>3 Followers</Text>
                 </View>
 
@@ -138,10 +144,16 @@ const ThreadsDetails = ({ route }: any) => {
             </View>
 
             <View style={styles.line} />
-            <FlatList
-                data={userThreads}
-                renderItem={renderContacts}
-            />
+            
+            {ThreadsArray ? (
+                <FlatList
+                    data={ThreadsArray}
+                    renderItem={renderContacts}
+                   style={{marginTop: 30}}
+                />
+            ) : (
+                <Text style={{ textAlign: 'center', marginVertical: 20, color: 'black' }}>Loading threads...</Text>
+            )}
 
         </View>
     )

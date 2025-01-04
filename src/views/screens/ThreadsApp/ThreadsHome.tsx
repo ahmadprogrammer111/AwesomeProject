@@ -19,68 +19,38 @@ const ThreadsHome = ({ route }: any) => {
     const dispatch = useDispatch()
 
     const Email = useSelector((state: any) => state.user.tempMail)
-    const username = useSelector((state: any) => state.user.user.username)
+    const user = useSelector((state: any) => state.user.user)
 
 
     const [threads, setThreads] = useState<any>()
 
-
-
-
-    useEffect(() => {
-        // const getStoredEmail = async () => {
-        try {
-            if (Email) {
-                console.log('Email getting from redux: ', Email)
-            } else {
-                console.log('No Email from redux')
-            }
-            console.log('Email!! from redux store', Email)
-
-            if (Email) {
+    useFocusEffect(useCallback(
+        () => {
+            try {
                 const subscriber = firestore()
-                    .collection('Users')
-                    .where('email', '==', Email)
+                    .collection('Threads')
+                    .orderBy('createdAt', 'desc')
                     .onSnapshot(documentSnapshot => {
-                        console.log('User data: ', documentSnapshot.docs[0].data())
-                        const userData = documentSnapshot.docs[0].data()
-                        dispatch(addUser(userData))
+                        console.log('Threads: ', documentSnapshot.docs)
+                        const threadsArray = documentSnapshot.docs.map(item => item.data())
+                        if (threadsArray) {
+                            console.log('my array', threadsArray)
+                            setThreads(threadsArray)
+                        }
+
                     })
+
                 return () => subscriber();
-            } else {
-                console.log('from Homescreen. There is no value in Email: ', Email)
+            } catch (error) {
+                console.log('error fetching threads...', error)
             }
 
-        } catch (error) {
-            console.log('Err fetching Email from redux-persist', error)
-        }
-        // }
-        // getStoredEmail()
 
-    }, [])
+        },
+        [],
+    ))
 
 
-    useEffect(() => {
-        try {
-            const subscriber = firestore()
-                .collection('Threads')
-                .orderBy('createdAt', 'desc')
-                .onSnapshot(documentSnapshot => {
-                    console.log('Threads: ', documentSnapshot.docs)
-                    const threadsArray = documentSnapshot.docs.map(item => item.data())
-                    if (threadsArray) {
-                        console.log('my array', threadsArray)
-                        setThreads(threadsArray)
-                    }
-                    // const threadsData = [...item.data().thread, item.data().thread]
-                    // console.log(threadsData)
-                })
-
-            return () => subscriber();
-        } catch (error) {
-            console.log('error fetching threads...', error)
-        }
-    }, [])
 
     const renderContacts = ({ item }: any) => {
 
@@ -120,9 +90,11 @@ const ThreadsHome = ({ route }: any) => {
 
     return (
         <View style={styles.container}>
-            <View style={{ flex: 0.02 }} />
+            <View style={{ height: '1%' }} />
             <Image style={{ width: 50, height: 50, alignSelf: 'center' }}
                 source={require('../../../assets/images/Threads.png')} />
+            <View style={{ height: '1%' }} />
+
             <FlatList
                 data={threads}
                 renderItem={renderContacts}

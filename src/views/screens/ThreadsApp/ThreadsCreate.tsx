@@ -45,6 +45,26 @@ const ThreadsCreate = () => {
         } catch (error) {
             console.log('error Creating thread', error)
         }
+        try {
+            await
+                firestore()
+                    .collection('Users')
+                    .doc(Email)
+                    .update({
+                        // thread: thread,
+                        // email: Email,
+                        // username: user.username,
+                        // bio: user.bio,
+                        // createdAt: firestore.FieldValue.serverTimestamp(),
+                        post: firestore.FieldValue.arrayUnion(thread)
+                    })
+
+            setThread('')
+            console.log(' Created thread')
+            navigation.navigate('ThreadsHome')
+        } catch (error) {
+            console.log('error Creating thread', error)
+        }
     }
     // try {
     //     await
