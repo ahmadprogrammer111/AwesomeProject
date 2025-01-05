@@ -34,33 +34,33 @@ const ThreadsDetails = ({ route }: any) => {
     const getData = async () => {
         if (user) {
             console.log('user from props', user)
-            // setData(user)
         } else {
             console.error('No user from redux', Error)
         }
         try {
             if (user?.email) {
                 const subscriber = firestore()
-                    .collection('Users')
+                    .collection('Threads')
                     .where('email', '==', user?.email)
                     .onSnapshot(documentSnapshot => {
-                        console.log('My array on detail screen', documentSnapshot?.docs?.map((item: any) => item.data()))
+                        // console.log('My array on detail screen', documentSnapshot?.docs?.map((item: any) => item.data()))
                         const Threads: any = documentSnapshot?.docs?.map((item: any) => item.data())
 
                         if (Threads) {
                             console.log('my array', JSON.stringify(Threads))
-                            console.log('Only Threads', Threads[0]?.post?.map((item: any) => item))
-                            const post = Threads[0].post?.map((item: any) => item)
+                            console.log('Only Threads', Threads.map((item: any) => item.thread))
+                            const post = Threads.map((item: any) => item.thread)
                             setData(Threads)
                             setThreadsArray(post)
                         }
-
                     })
                 return () => subscriber();
             } else {
-                console.log('from Homescreen. There is no value in Email: ', user?.email)
+                console.log('Error from Homescreen at getting threads.There is no value in Email:', user?.email)
             }
+
         }
+
         catch (error) {
             console.log('Err fetching Email from redux-persist', error)
         }
@@ -69,16 +69,15 @@ const ThreadsDetails = ({ route }: any) => {
 
     const renderContacts = ({ item }: any) => {
 
-        // console.log(item)f
 
         return (<View style={{}}>
             <TouchableOpacity
-                // onPress={() => navigation.navigate('ThreadsDetails', { user: item })} */}
+
                 style={styles.main}>
                 <Icon3 name='person-circle' size={50} color='grey' />
                 <View style={styles.submain}>
                     <View style={styles.textContainer}>
-                        <Text style={styles.userName}>{data[0]?.username}</Text>
+                        <Text style={styles.name}>{data[0]?.name}</Text>
                         <Text style={styles.text}>{item}</Text>
                     </View>
                     <Icon4 name='more-horizontal' size={22} color='black' />
@@ -110,16 +109,14 @@ const ThreadsDetails = ({ route }: any) => {
 
             <Header screen='ThreadsHome2' />
             <View>
-                <Text style={styles.threads}>
-                    Threads
-                </Text>
+
 
                 <View style={{ flex: 0.05 }} />
 
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginHorizontal: 20, alignItems: 'center' }}>
                     <View>
-                        <Text style={styles.originalName}>{data?.[0]?.username ?? 'Loading...'}</Text>
-                        <Text style={styles.userName}>{data?.[0]?.email ?? 'Loading...'}</Text>
+                        <Text style={styles.originalName}>{data?.[0]?.name ?? 'Loading...'}</Text>
+                        <Text style={styles.name}>{(data?.[0]?.bio || 'This User Has no About Info') ?? 'Loading...'}</Text>
                     </View>
 
                     <Icon2 name='person-circle' size={60} color='grey' />
@@ -128,7 +125,7 @@ const ThreadsDetails = ({ route }: any) => {
 
 
                 <View style={styles.detailContainer}>
-                    <Text style={{ color: '#616a6b', fontFamily: 'Nunito-Regular' }}>{data?.[0]?.bio ?? 'Loading bio...'} </Text>
+                    {/* <Text style={{ color: '#616a6b', fontFamily: 'Nunito-Regular' }}>{data?.[0]?.bio ?? 'Loading bio...'} </Text> */}
                     <Text style={{ color: '#cacfd2', fontFamily: 'Nunito-Regular' }}>3 Followers</Text>
                 </View>
 
@@ -144,12 +141,12 @@ const ThreadsDetails = ({ route }: any) => {
             </View>
 
             <View style={styles.line} />
-            
+
             {ThreadsArray ? (
                 <FlatList
                     data={ThreadsArray}
                     renderItem={renderContacts}
-                   style={{marginTop: 30}}
+                    style={{ marginTop: 30 }}
                 />
             ) : (
                 <Text style={{ textAlign: 'center', marginVertical: 20, color: 'black' }}>Loading threads...</Text>
@@ -186,7 +183,7 @@ const styles = StyleSheet.create({
         fontFamily: 'Nunito-Bold',
         fontSize: 18,
     },
-    userName: {
+    name: {
         color: '#616a6b',
         fontFamily: 'Nunito-Medium',
         fontSize: 14,
@@ -276,15 +273,6 @@ const styles = StyleSheet.create({
         elevation: 10,
         paddingVertical: 20,
     },
-
-    // userName: {
-    //     color: 'black',
-    //     fontFamily: 'Nunito-Bold',
-    //     fontSize: 18,
-    //     // marginTop: 6
-    //     // width: '70%',
-    //     // marginLeft: 5,
-    // },
     text: {
         // width: '100%',
         color: 'grey',

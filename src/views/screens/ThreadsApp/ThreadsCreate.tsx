@@ -7,9 +7,9 @@ import { useNavigation } from '@react-navigation/native'
 
 
 
-
-
 const ThreadsCreate = () => {
+
+
     const navigation = useNavigation<any>()
     const user = useSelector((state: any) => state.user.user)
     const Email = useSelector((state: any) => state.user.tempMail)
@@ -34,8 +34,8 @@ const ThreadsCreate = () => {
                     .add({
                         thread: thread,
                         email: Email,
-                        username: user.username,
-                        bio: user.bio,
+                        name: user?.name,
+                        bio: user?.bio,
                         createdAt: firestore.FieldValue.serverTimestamp()
                     })
 
@@ -45,53 +45,7 @@ const ThreadsCreate = () => {
         } catch (error) {
             console.log('error Creating thread', error)
         }
-        try {
-            await
-                firestore()
-                    .collection('Users')
-                    .doc(Email)
-                    .update({
-                        // thread: thread,
-                        // email: Email,
-                        // username: user.username,
-                        // bio: user.bio,
-                        // createdAt: firestore.FieldValue.serverTimestamp(),
-                        post: firestore.FieldValue.arrayUnion(thread)
-                    })
-
-            setThread('')
-            console.log(' Created thread')
-            navigation.navigate('ThreadsHome')
-        } catch (error) {
-            console.log('error Creating thread', error)
-        }
     }
-    // try {
-    //     await
-    //         firestore()
-    //             .collection('allThreads')
-    //             .doc(Email)
-    //             .set({
-    //                 post: firestore.FieldValue.arrayUnion({
-    //                     thread,
-    //                 }),
-    //                 // email: Email,
-    //                 // username: user.username,
-    //                 // bio: user.bio,
-    //                 createdAt: firestore.FieldValue.serverTimestamp()
-    //             })
-
-    //     setThread('')
-    //     console.log(' Created thread')
-    //     navigation.navigate('ThreadsHome')
-    // } catch (error) {
-    //     console.log('error Creating thread', error)
-    // }
-
-    // }
-
-
-
 
     const [length, setLength] = useState(30)
     const Line = () => {
@@ -123,7 +77,7 @@ const ThreadsCreate = () => {
                     <Line />
                 </View>
                 <View style={styles.threadTextContainer}>
-                    <Text style={styles.userName}>{user.username}</Text>
+                    <Text style={styles.name}>{user.name}</Text>
                     <TextInput
                         value={thread}
                         onChangeText={(text) => {
@@ -139,7 +93,9 @@ const ThreadsCreate = () => {
             </View>
         </View>
     )
+
 }
+
 
 export default ThreadsCreate
 
@@ -195,12 +151,11 @@ const styles = StyleSheet.create({
         fontFamily: 'Nunito-Regular',
         // paddingVertical: 10
     },
-    userName: {
+    name: {
         color: 'black',
         fontFamily: 'Nunito-Bold',
         fontSize: 18,
         width: '70%',
         marginLeft: 5,
     },
-
 })

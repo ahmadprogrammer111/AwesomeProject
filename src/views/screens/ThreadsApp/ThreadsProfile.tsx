@@ -21,67 +21,57 @@ const ThreadsProfile = () => {
     const navigation = useNavigation<any>()
     const [modalVisible, setModalVisible] = useState(false)
 
-
     const dispatch = useDispatch()
-    // const user = useSelector((state: any) => state.user.user)
+    const user = useSelector((state: any) => state.user.user)
     const Email = useSelector((state: any) => state.user.tempMail)
 
-
     const [data, setData] = useState<any>()
-    const [email, setEmail] = useState('')
+    // const [email, setEmail] = useState('')
     const [myThreads, setMyThreads] = useState<any>()
 
-    // useEffect(() => {
 
 
-    //     if (user) {
-    //         console.log('modifying the userdata : ', user.post.map((item: any) => item))
-    //         const tempThreads = user.post.map((item: any) => item)
-    //         setMyThreads(tempThreads)
-    //     }
-    //     if (user) {
-    //         console.log('user from redux', user)
-    //         setData(user)
-    //     }
-    //     if (Email) {
-    //         console.log('user from redux', Email)
-    //         setEmail(Email)
-    //     }
 
-    // }, [])
 
     useFocusEffect(useCallback(
         () => {
+            try {
+                if (Email) {
+                    const subscriber = firestore()
+                        .collection('Threads')
+                        .where('email', '==', Email)
+                        // .orderBy('createdAt', 'desc')
+                        .onSnapshot(documentSnapshot => {
+                            console.log('Threads  at Profile: ', documentSnapshot)
+                            const threadsArray = documentSnapshot.docs.map(item => item.data())
+                            if (threadsArray) {
+                                console.log('my array', threadsArray)
+                                setMyThreads(threadsArray)
+                            }
+                        })
+                    return () => subscriber();
+                } else {
+                    console.log('from Homescreen. There is no value in Email: ', Email)
+                    console.error('Error consoled', Error)
+                }
 
-        try {
-            if (Email) {
-                const subscriber = firestore()
-                    .collection('Threads')
-                    .where('email', '==', Email)
-                    .onSnapshot(documentSnapshot => {
-                        console.log('Threads: ', documentSnapshot.docs)
-                        const threadsArray = documentSnapshot.docs.map(item => item.data())
-                        if (threadsArray) {
-                            console.log('my array', threadsArray)
-                            setMyThreads(threadsArray)
-                        }
-
-                    })
-                return () => subscriber();
-            } else {
-                console.log('from Homescreen. There is no value in Email: ', Email)
+            } catch (error) {
+                console.log('Err fetching Email from redux-persist', error)
             }
+        },
+        [Email],
+    ))
 
-        } catch (error) {
-            console.log('Err fetching Email from redux-persist', error)
+
+
+
+    useEffect(() => {
+
+        if (user) {
+            console.log('user from redux', user)
+            setData(user)
         }
-        // }
-        // getStoredEmail()
-
-    },
-    [],
-))
-
+    }, [])
 
 
 
@@ -106,31 +96,48 @@ const ThreadsProfile = () => {
         });
     };
 
-
-
-
-    const setUserName = (Value: string) => {
-        setData({ ...data, username: Value });
-        console.log(' Edited userName:', data?.username)
+    const setName = (Value: string) => {
+        setData({ ...data, name: Value });
+        console.log(' Edited name:', data?.name)
     }
     const setBio = (Value: string) => {
         setData({ ...data, bio: Value });
         console.log(' Edited Bio:', data?.bio)
     }
 
-    const updateProfile = () => {
+    const updateProfile = async () => {
         firestore()
             .collection('Users')
-            .doc(email)
+            .doc(Email)
             .update({
-                username: data?.username,
+                name: data?.name,
                 bio: data?.bio,
-                // selectedImage: data?.selectedImage,
             })
             .then(() => {
                 dispatch(addUser(data))
-                console.log(`User with Email:  ${email}  updated on    f i r e  store and   R e d u x  !`);
-            });
+                console.log(`User with Email:  ${Email}  updated on    F I R E S T O R E   and   R E D U X  !`);
+            })
+
+        const filteredData = await firestore()
+            .collection('Threads')
+            .where('email', '==', Email)
+            .get()
+
+        const batch = firestore().batch()
+
+
+        const updateFields = {
+            name: data?.name,
+            bio: data?.bio
+        }
+
+        filteredData.forEach((document) => {
+            const currentDocId = firestore().collection('Threads').doc(document.id)
+            batch.update(currentDocId, updateFields)
+        })
+        console.log('Updating the profile on Threads Collection pls wait...')
+        batch.commit()
+
     }
     const Line = (props: any) => {
         const { width } = props
@@ -144,7 +151,7 @@ const ThreadsProfile = () => {
 
     const renderContacts = ({ item }: any) => {
 
-        // console.log(item)f
+        // console.log('Items in the flatlist:', item)/
 
         return (<View style={{}}>
             <TouchableOpacity
@@ -153,7 +160,7 @@ const ThreadsProfile = () => {
                 <Icon3 name='person-circle' size={50} color='grey' />
                 <View style={styles.submain}>
                     <View style={styles.textContainer}>
-                        <Text style={styles.userName}>{item.username}</Text>
+                        <Text style={styles.name}>{item.name}</Text>
                         <Text style={styles.text}>{item.thread}</Text>
                     </View>
                     <Icon4 name='more-horizontal' size={22} color='black' />
@@ -189,35 +196,35 @@ const ThreadsProfile = () => {
                 <Icon name='align-right' size={20} color='black' />
             </TouchableOpacity>
 
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginHorizontal: 20, alignItems: 'center' }}>
+            <View style={styles.personInfo}>
                 <View>
-                    <Text style={styles.originalName}>{data?.username}</Text>
-                    <Text style={styles.userName}>{data?.email}</Text>
+                    <Text style={styles.originalName}>{data?.name}</Text>
+                    <Text style={styles.name}>{data?.email}</Text>
                 </View>
                 {!data?.selectedImage ? <Icon2 name='person-circle' size={60} color='grey' /> :
                     <Image source={{ uri: data?.selectedImage }} style={{ height: 50, width: 50, borderRadius: 25 }} />
                 }
             </View>
 
-            <View style={{ flex: 0.02 }} />
+            <View style={{ height: '2%' }} />
 
             <View style={styles.detailContainer}>
                 <Text style={{ color: '#616a6b', fontFamily: 'Nunito-Regular' }}>{data?.bio}</Text>
                 <Text style={{ color: '#cacfd2', fontFamily: 'Nunito-Regular' }}>3 Followers</Text>
             </View>
 
-            <View style={{ flex: 0.05 }} />
+            <View style={{ height: "3%" }} />
 
             <View style={styles.buttonContainer}>
                 <TouchableOpacity onPress={() =>
                     setModalVisible(true)
                 }
                     style={[styles.button, { backgroundColor: 'white' }]}>
-                    <Text style={[styles.buttonText,]}>Edit Profile</Text>
+                    <Text style={styles.buttonText}>Edit Profile</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                     style={[styles.button, { backgroundColor: 'white' }]}>
-                    <Text style={[styles.buttonText,]}>Share Profile</Text>
+                    <Text style={styles.buttonText}>Share Profile</Text>
                 </TouchableOpacity>
             </View>
 
@@ -231,7 +238,10 @@ const ThreadsProfile = () => {
             >
 
                 <View style={styles.headerContainer}>
-                    <TouchableOpacity onPress={() => setModalVisible(false)}
+                    <TouchableOpacity onPress={() => {
+                        setModalVisible(false)
+                        setData(user)
+                    }}
                     >
                         <Text style={styles.sideHeaders}>Cancel</Text>
                     </TouchableOpacity>
@@ -252,7 +262,7 @@ const ThreadsProfile = () => {
                             <View>
                                 <Text style={[styles.title, { marginLeft: 15 }]}>Name</Text>
                                 <TextInput style={[styles.textInput1, { marginLeft: 10 }]}
-                                    value={data?.username} onChangeText={(Text) => setUserName(Text)}
+                                    value={data?.name} onChangeText={(Text) => setName(Text)}
                                     placeholder='Name' placeholderTextColor='grey' maxLength={20}
                                 />
                             </View>
@@ -269,7 +279,7 @@ const ThreadsProfile = () => {
                         <Text style={[styles.title, { marginLeft: 15 }]}>Bio</Text>
                         <TextInput style={[styles.textInput, { marginLeft: 10 }]}
                             value={data?.bio} onChangeText={(Text) => setBio(Text)}
-                            placeholder='Bio here' placeholderTextColor='grey' maxLength={20}
+                            placeholder='Bio here' placeholderTextColor='grey' maxLength={50} multiline={true}
                         />
 
                         <Line width='90%' />
@@ -290,7 +300,7 @@ const ThreadsProfile = () => {
                 </Text>
             </View>
 
-            
+
             {myThreads ? (
                 <FlatList
                     data={myThreads}
@@ -318,7 +328,7 @@ const styles = StyleSheet.create({
         fontFamily: 'Nunito-Bold',
         fontSize: 18,
     },
-    userName: {
+    name: {
         color: '#616a6b',
         fontFamily: 'Nunito-Medium',
         fontSize: 14,
@@ -328,7 +338,7 @@ const styles = StyleSheet.create({
         marginHorizontal: 20,
         justifyContent: 'space-between',
         // backgroundColor: 'red',
-        flex: 0.09
+        height: '6%'
     },
     buttonContainer: {
         // gap: 10,
@@ -453,5 +463,11 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontFamily: 'Nunito-Medium',
     },
+    personInfo: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginHorizontal: 20,
+        alignItems: 'center',
+    }
 
 })

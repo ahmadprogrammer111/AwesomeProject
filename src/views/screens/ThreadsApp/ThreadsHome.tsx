@@ -31,13 +31,12 @@ const ThreadsHome = ({ route }: any) => {
                     .collection('Threads')
                     .orderBy('createdAt', 'desc')
                     .onSnapshot(documentSnapshot => {
-                        console.log('Threads: ', documentSnapshot.docs)
+                        console.log('Threads at Home: ', documentSnapshot.docs)
                         const threadsArray = documentSnapshot.docs.map(item => item.data())
                         if (threadsArray) {
-                            console.log('my array', threadsArray)
+                            console.log('my array at home', threadsArray)
                             setThreads(threadsArray)
                         }
-
                     })
 
                 return () => subscriber();
@@ -51,6 +50,34 @@ const ThreadsHome = ({ route }: any) => {
     ))
 
 
+    useFocusEffect(useCallback(
+        () => {
+            try {
+                if (Email) {
+                    const subscriber = firestore()
+                        .collection('Users')
+                        .where('email', '==', Email)
+                        .onSnapshot(documentSnapshot => {
+                            console.log('Threads  at profile: ', documentSnapshot.docs)
+                            const threadsArray = documentSnapshot.docs.map(item => item.data())
+                            if (threadsArray) {
+                                console.log('userData is being Transferred to redux ', threadsArray)
+                                dispatch(addUser(threadsArray[0]))
+                            }
+                        })
+                    return () => subscriber();
+                } else {
+                    console.log('from Homescreen. There is no value in Email: ', Email)
+                }
+
+            } catch (error) {
+                console.log('Err fetching Email from redux-persist', error)
+            }
+
+        },
+        [],
+    ))
+
 
     const renderContacts = ({ item }: any) => {
 
@@ -61,7 +88,7 @@ const ThreadsHome = ({ route }: any) => {
                 <Icon name='person-circle' size={50} color='grey' />
                 <View style={styles.submain}>
                     <View style={styles.textContainer}>
-                        <Text style={styles.userName}>{item.username}</Text>
+                        <Text style={styles.userName}>{item.name}</Text>
                         <Text style={styles.text}>{item.thread}</Text>
                     </View>
                     <Icon2 name='more-horizontal' size={22} color='black' />

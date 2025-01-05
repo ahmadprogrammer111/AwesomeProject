@@ -16,11 +16,19 @@ const ThreadsSignUp = () => {
     const [name, setName] = useState('')
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
+    const [isValid, setIsValid] = useState<boolean>(true)
+
 
     const navigation = useNavigation<any>()
 
     const bio = ''
     const selectedImage = ''
+
+    const REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+    const checkEmail = (email: any) => REGEX.test(email)
+
+    const validateEmail = () => setIsValid(checkEmail(email))
 
 
 
@@ -32,52 +40,64 @@ const ThreadsSignUp = () => {
 
     const createUserWithEmailAndPassword = async () => {
 
-        console.log('Email:', email);
-        console.log('Password:', password);
-        if (!email || !password) {
-            console.log('Email or Password is empty');
-            Alert.alert('Email or Password is empty')
-            return setIsLoading(false)
+        validateEmail()
 
+        if (!checkEmail(email)) {
+            Alert.alert('Enter Correct Email!!');
+            setIsLoading(false);
+            return;
+        } else {
+            console.log('Email:', email);
+            console.log('Password:', password);
+            if (!email || !password) {
+                console.log('Email or Password is empty');
+                Alert.alert('Email or Password is empty')
+                return setIsLoading(false)
+            }
+
+            Email()
+
+            Auth()
+                .createUserWithEmailAndPassword(email, password)
+                .then(() => {
+                    console.log('User Signed Up! sucessfully')
+                    firestore()
+                        .collection('Users')
+                        .doc(email)
+                        .set({
+                            name: name ? name : 'defaultName',
+                            email: email,
+                            password: password,
+                            bio: bio,
+                            // selectedImage: selectedImage,
+                        });
+                        // firestore()
+                        // .collection('Threads')
+                        // // .doc(email)
+                        // .add({
+                        //     name: name ? name : 'defaultName',
+                        //     email: email,
+                        //     password: password,
+                        //     bio: bio,
+                        //     thread:'',
+                        //     // selectedImage: selectedImage,
+                        // });
+                    setIsLoading(false)
+                    navigation.navigate('ThreadsHome1' as never)
+                })
+                .catch((error) => {
+                    if (error.code == 'auth/email-already-in-use') {
+                        console.log('That email address is already in use!')
+                    }
+                    if (error.code == 'auth/invalid-email') {
+                        console.log('That email address is invalid!!')
+                    }
+                    if (error.code == 'auth/operation-not-allowed') {
+                        console.log('The email is disabled by the owner of the app.')
+                    }
+                    console.log(error)
+                })
         }
-        Email()
-
-        Auth()
-            .createUserWithEmailAndPassword(email, password)
-            .then(() => {
-                console.log('User Signed Up! sucessfully')
-                firestore()
-                    .collection('Users')
-                    .doc(email)
-                    .set({
-                        username: name,
-                        email: email,
-                        password: password,
-                        bio: bio,
-                        selectedImage: selectedImage,
-                        post: []
-                    });
-                // firestore()
-                //     .collection('Threads')
-                //     .doc(email)
-                //     .set({
-                //         threads: []
-                //     });
-                navigation.navigate('ThreadsHome1' as never)
-            })
-            .catch((error) => {
-                if (error.code == 'auth/email-already-in-use') {
-                    console.log('That email address is already in use!')
-                }
-                if (error.code == 'auth/invalid-email') {
-                    console.log('That email address is invalid!!')
-                }
-                if (error.code == 'auth/operation-not-allowed') {
-                    console.log('The email is disabled by the owner of the app.')
-                }
-                console.log(error)
-            })
-
     }
 
 
@@ -94,10 +114,10 @@ const ThreadsSignUp = () => {
                     </View>
                     <View style={{ height: '5%' }} />
 
-                    <ThreadsInput text={name} onChangeText={setName} placeholder='UserName ' />
+                    <ThreadsInput text={name} onChangeText={setName} placeholder='Name' />
                     <View style={{ height: '2%' }} />
 
-                    <ThreadsInput text={email} onChangeText={setEmail} placeholder='Email ' />
+                    <ThreadsInput text={email} onChangeText={setEmail} placeholder='Email' />
                     <View style={{ height: '2%' }} />
                     <ThreadsInput text={password} onChangeText={setPassword} placeholder='Password' />
                     <View style={{ height: '2%' }} />
@@ -129,7 +149,7 @@ const ThreadsSignUp = () => {
                     <TouchableOpacity onPress={() => navigation.navigate('ThreadsLogin')}
                         style={styles.button}
                     >
-                        <Text style={{ color: 'white', fontFamily: 'Nunito-Bold', fontSize: 20, }}>Login</Text>
+                        <Text style={styles.login}>Login</Text>
                     </TouchableOpacity>
                 </>}
         </View >
@@ -167,10 +187,12 @@ const styles = StyleSheet.create({
         // marginVertical: 10,
         //  marginTop: 10,
         //  color: 'black',
-        alignSelf: 'baseline',
+        // alignSelf: 'baseline',
         textAlign: 'center',
         fontFamily: 'Nunito-Bold',
-        fontSize: 17,
+        fontSize: 20,
+        color: 'white',
+
     },
     forgotTextContainer: {
         justifyContent: 'space-between',
