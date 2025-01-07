@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View, Image } from 'react-native'
-import React, { useEffect, useState } from 'react'
-import { useNavigation } from '@react-navigation/native'
+import React, { useCallback, useEffect, useState } from 'react'
+import { useFocusEffect, useNavigation } from '@react-navigation/native'
 
 import auth from '@react-native-firebase/auth';
 
@@ -21,17 +21,23 @@ const ThreadsSplash = () => {
         return subscriber;
     }, [initializing]);
 
-    useEffect(() => {
-        if (!initializing) {
-            setTimeout(() => {
-                if (user) {
-                    navigation.navigate('ThreadsHome1')
-                } else {
-                    navigation.navigate('ThreadsLogin')
-                }
-            }, 2000);
-        }
-    }, [initializing])
+    // useEffect(() => {
+    useFocusEffect(useCallback(
+        () => {
+            if (!initializing) {
+                setTimeout(() => {
+                    if (user) {
+                        navigation.navigate('ThreadsHome1')
+                    } else {
+                        navigation.navigate('ThreadsLogin')
+                    }
+                }, 2000);
+            }
+        }, [initializing],
+    ))
+
+
+    // }, [initializing])
 
 
     return (

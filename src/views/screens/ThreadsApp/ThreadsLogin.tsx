@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Image, TouchableOpacity, Alert } from 'react-native'
+import { StyleSheet, Text, View, Image, TouchableOpacity, Alert, TextInput, Pressable } from 'react-native'
 import React, { useState } from 'react'
 import Furnitureinput from '../../../components/Furniture_components/Furnitureinput'
 import ThreadsInput from '../../../components/ThreadsComponents/ThreadsInput'
@@ -9,6 +9,7 @@ import FurnitureButton2 from '../../../components/Furniture_components/Furniture
 import { useDispatch } from 'react-redux'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { addEmail } from '../../../redux/Slices/userSlice'
+import Icon from 'react-native-vector-icons/FontAwesome'
 
 
 const ThreadsLogin = () => {
@@ -17,6 +18,9 @@ const ThreadsLogin = () => {
     const dispatch = useDispatch()
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
+
+    const [isVisible, setIsVisible] = useState(true)
+
     const navigation = useNavigation<any>()
 
 
@@ -44,7 +48,7 @@ const ThreadsLogin = () => {
         }
         const Email = () => {
             dispatch(addEmail(email))
-    
+
         }
 
         auth()
@@ -52,7 +56,7 @@ const ThreadsLogin = () => {
             .then(() => {
                 Email()
                 console.log('storing Email in async,', email)
-            
+
                 storingEmail(email)
 
                 console.log('User Logged In! sucessfully')
@@ -100,7 +104,16 @@ const ThreadsLogin = () => {
 
             <View style={{ height: '2%' }} />
 
-            <ThreadsInput text={password} onChangeText={setPassword} placeholder='Enter Password here' />
+
+            <View style={styles.passwordinputcontainer}>
+                <TextInput value={password} onChangeText={setPassword} secureTextEntry={isVisible} maxLength={10} 
+                    style={styles.textinput} placeholder='Password' placeholderTextColor='#a6acaf' />
+                <Pressable onPress={() => setIsVisible(!isVisible)} style={styles.eyeView}>
+                    {isVisible ? <Icon name='eye' size={20} color='grey' /> :
+                        <Icon name='eye-slash' size={20} color='grey' />
+                    }
+                </Pressable>
+            </View>
 
             <TouchableOpacity onPress={() => navigation.navigate('ThreadsForgotPass')}>
                 <Text style={styles.forgotPass}>Forgot Password</Text>
@@ -219,5 +232,39 @@ const styles = StyleSheet.create({
         fontSize: 20,
         color: '#616a6b',
         textAlign: 'center'
+    },
+    maininputcontainer: {
+    },
+    passwordinputcontainer: {
+        padding: 8,
+        marginHorizontal: 25,
+        backgroundColor: '#f2f3f4',
+        borderWidth: 1,
+        borderRadius: 15,
+        borderColor: '#D9D9D9',
+        flexDirection: 'row',
+        // justifyContent: 'space-between'
+        gap: '90%'
+    },
+    textinput: {
+        color: 'black',
+        fontFamily: 'Nunito-Medium',
+        fontSize: 17,
+        // backgroundColor: 'red',
+        width: '80%'
+    },
+    header: {
+        fontFamily: 'Poppins-Regular',
+        color: 'black',
+        fontSize: 17,
+    },
+    eyeView: {
+        alignSelf: 'center',
+        // backgroundColor: 'red',
+        height: 40,
+        width: 40,
+        alignItems: 'center',
+        justifyContent: 'center'
+
     }
 })

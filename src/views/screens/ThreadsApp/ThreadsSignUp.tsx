@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Image, TouchableOpacity, Pressable, Alert, ActivityIndicator } from 'react-native'
+import { StyleSheet, Text, View, Image, TouchableOpacity, Pressable, Alert, ActivityIndicator, TextInput } from 'react-native'
 import React, { useState } from 'react'
 import ThreadsInput from '../../../components/ThreadsComponents/ThreadsInput'
 import { useNavigation } from '@react-navigation/native'
@@ -7,6 +7,7 @@ import firestore from '@react-native-firebase/firestore'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useDispatch } from 'react-redux'
 import { addEmail, addUser } from '../../../redux/Slices/userSlice'
+import Icon from 'react-native-vector-icons/FontAwesome'
 
 const ThreadsSignUp = () => {
     const dispatch = useDispatch()
@@ -17,6 +18,8 @@ const ThreadsSignUp = () => {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [isValid, setIsValid] = useState<boolean>(true)
+    const [isVisible, setIsVisible] = useState(false)
+
 
 
     const navigation = useNavigation<any>()
@@ -71,17 +74,17 @@ const ThreadsSignUp = () => {
                             bio: bio,
                             // selectedImage: selectedImage,
                         });
-                        // firestore()
-                        // .collection('Threads')
-                        // // .doc(email)
-                        // .add({
-                        //     name: name ? name : 'defaultName',
-                        //     email: email,
-                        //     password: password,
-                        //     bio: bio,
-                        //     thread:'',
-                        //     // selectedImage: selectedImage,
-                        // });
+                    // firestore()
+                    // .collection('Threads')
+                    // // .doc(email)
+                    // .add({
+                    //     name: name ? name : 'defaultName',
+                    //     email: email,
+                    //     password: password,
+                    //     bio: bio,
+                    //     thread:'',
+                    //     // selectedImage: selectedImage,
+                    // });
                     setIsLoading(false)
                     navigation.navigate('ThreadsHome1' as never)
                 })
@@ -119,7 +122,18 @@ const ThreadsSignUp = () => {
 
                     <ThreadsInput text={email} onChangeText={setEmail} placeholder='Email' />
                     <View style={{ height: '2%' }} />
-                    <ThreadsInput text={password} onChangeText={setPassword} placeholder='Password' />
+                    {/* <ThreadsInput text={password} onChangeText={setPassword} placeholder='Password' /> */}
+
+                    <View style={styles.passwordinputcontainer}>
+                        <TextInput value={password} onChangeText={setPassword} secureTextEntry={isVisible} maxLength={10}
+                            style={styles.textinput} placeholder='Password' placeholderTextColor='#a6acaf' />
+                        <Pressable onPress={() => setIsVisible(!isVisible)} style={{ alignSelf: 'center' }}>
+                            {isVisible ? <Icon name='eye' size={20} color='grey' /> :
+                                <Icon name='eye-slash' size={20} color='grey' />
+                            }
+                        </Pressable>
+                    </View>
+
                     <View style={{ height: '2%' }} />
 
                     <TouchableOpacity onPress={() => {
@@ -221,5 +235,30 @@ const styles = StyleSheet.create({
         fontSize: 20,
         color: '#616a6b',
         textAlign: 'center'
-    }
+    },
+    maininputcontainer: {
+    },
+    passwordinputcontainer: {
+        padding: 8,
+        marginHorizontal: 25,
+        backgroundColor: '#f2f3f4',
+        borderWidth: 1,
+        borderRadius: 15,
+        borderColor: '#D9D9D9',
+        flexDirection: 'row',
+        // justifyContent: 'space-between'
+        gap:'90%'
+    },
+    textinput: {
+        color: 'black',
+        fontFamily: 'Nunito-Medium',
+        fontSize: 17,
+        // backgroundColor: 'red',
+        width: '80%'
+    },
+    header: {
+        fontFamily: 'Poppins-Regular',
+        color: 'black',
+        fontSize: 17,
+    },
 })

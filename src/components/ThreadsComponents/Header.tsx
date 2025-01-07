@@ -10,7 +10,7 @@ const Header = (props: any) => {
     const navigation = useNavigation<any>()
     return (
         <View style={styles.container}>
-            <TouchableOpacity style={styles.backContainer} onPress={() => navigation.navigate(`${screen}`)}>
+            <TouchableOpacity style={styles.backContainer} onPress={() => navigation.goBack()}>
                 <Icon name='caret-back-sharp' size={22} color='black' style={styles.backIcon} />
                 <Text style={styles.backText}>Back</Text>
             </TouchableOpacity>

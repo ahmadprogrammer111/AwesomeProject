@@ -1,10 +1,11 @@
 import { FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import Header from '../../../components/ThreadsComponents/Header'
-import Icon from 'react-native-vector-icons/FontAwesome'
-import Icon2 from 'react-native-vector-icons/Ionicons'
 import { useSelector } from 'react-redux'
 import firestore from '@react-native-firebase/firestore'
+
+import Icon from 'react-native-vector-icons/FontAwesome'
+import Icon2 from 'react-native-vector-icons/Ionicons'
 import Icon3 from 'react-native-vector-icons/Ionicons'
 import Icon4 from 'react-native-vector-icons/Feather'
 import Icon5 from 'react-native-vector-icons/FontAwesome'
@@ -107,14 +108,16 @@ const ThreadsDetails = ({ route }: any) => {
     return (
         <View style={styles.container}>
 
-            <Header screen='ThreadsHome2' />
+            <Header/>
             <View>
 
 
                 <View style={{ flex: 0.05 }} />
 
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginHorizontal: 20, alignItems: 'center' }}>
-                    <View>
+
+
+                    <View style={styles.info}>
                         <Text style={styles.originalName}>{data?.[0]?.name ?? 'Loading...'}</Text>
                         <Text style={styles.name}>{(data?.[0]?.bio || 'This User Has no About Info') ?? 'Loading...'}</Text>
                     </View>
@@ -309,6 +312,10 @@ const styles = StyleSheet.create({
         // alignSelf: 'center',
         // marginRight: 35,
         gap: 20,
+    },
+    info: {
+        width: '80%',
+        gap: '15%'
     }
 
 

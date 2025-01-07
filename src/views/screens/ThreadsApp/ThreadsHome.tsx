@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 import firestore from '@react-native-firebase/firestore'
 import { useDispatch, useSelector } from 'react-redux'
 import { addEmail, addUser } from '../../../redux/Slices/userSlice'
-import { useFocusEffect, useNavigation } from '@react-navigation/native'
+import { CommonActions, useFocusEffect, useNavigation } from '@react-navigation/native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import Icon from 'react-native-vector-icons/Ionicons'
 import Icon2 from 'react-native-vector-icons/Feather'
@@ -17,11 +17,12 @@ import Icon3 from 'react-native-vector-icons/FontAwesome'
 const ThreadsHome = ({ route }: any) => {
     const navigation = useNavigation<any>()
     const dispatch = useDispatch()
+    const [isRefreshing, setIsRefreshing] = useState(false)
 
     const Email = useSelector((state: any) => state.user.tempMail)
     const user = useSelector((state: any) => state.user.user)
 
-
+   
     const [threads, setThreads] = useState<any>()
 
     useFocusEffect(useCallback(
@@ -50,30 +51,33 @@ const ThreadsHome = ({ route }: any) => {
     ))
 
 
-    useFocusEffect(useCallback(
-        () => {
-            try {
-                if (Email) {
-                    const subscriber = firestore()
-                        .collection('Users')
-                        .where('email', '==', Email)
-                        .onSnapshot(documentSnapshot => {
-                            console.log('Threads  at profile: ', documentSnapshot.docs)
-                            const threadsArray = documentSnapshot.docs.map(item => item.data())
-                            if (threadsArray) {
-                                console.log('userData is being Transferred to redux ', threadsArray)
-                                dispatch(addUser(threadsArray[0]))
-                            }
-                        })
-                    return () => subscriber();
-                } else {
-                    console.log('from Homescreen. There is no value in Email: ', Email)
-                }
-
-            } catch (error) {
-                console.log('Err fetching Email from redux-persist', error)
+    const getDataFromFirebase = () => {
+        try {
+            if (Email) {
+                const subscriber = firestore()
+                    .collection('Users')
+                    .where('email', '==', Email)
+                    .onSnapshot(documentSnapshot => {
+                        console.log('Threads  at profile: ', documentSnapshot.docs)
+                        const threadsArray = documentSnapshot.docs.map(item => item.data())
+                        if (threadsArray) {
+                            console.log('userData is being Transferred to redux ', threadsArray)
+                            dispatch(addUser(threadsArray[0]))
+                        }
+                    })
+                return () => subscriber();
+            } else {
+                console.log('from Homescreen. There is no value in Email: ', Email)
             }
 
+        } catch (error) {
+            console.log('Err fetching Email from redux-persist', error)
+        }
+    }
+
+    useFocusEffect(useCallback(
+        () => {
+            getDataFromFirebase()
         },
         [],
     ))
@@ -125,6 +129,8 @@ const ThreadsHome = ({ route }: any) => {
             <FlatList
                 data={threads}
                 renderItem={renderContacts}
+                refreshing={isRefreshing}
+                onRefresh={getDataFromFirebase}
             />
 
 

@@ -12,8 +12,6 @@ const ThreadsInput = (Props: any) => {
         <View style={styles.textinputcontainer}>
             <TextInput value={text} onChangeText={onChangeText}
                 style={styles.textinput} placeholder={placeholder} placeholderTextColor='#a6acaf' />
-            
-
         </View>
 
     )

@@ -256,7 +256,17 @@ const App = () => {
       },
       screenOptions: {
          headerShown: false,
-         
+      }
+   })
+
+   const stack4 = createNativeStackNavigator({
+      screens: {
+         ThreadsSearch1: ThreadsSearch,
+         ThreadsDetails: ThreadsDetails
+      },
+      screenOptions: {
+         headerShown: false,
+
          // animation:'slide_from_right'
       }
    })
@@ -266,14 +276,14 @@ const App = () => {
       screens: {
          ThreadsHome: {
             screen: stack3, options: {
-               
+
                tabBarButton: (props) => (<RemoveRippleEffect {...props} />
                ),
                tabBarIcon: ({ color }) => <Icon6 name='home' color={color} size={30} />
             }
          },
          ThreadsSearch: {
-            screen: ThreadsSearch, options: {
+            screen: stack4, options: {
                tabBarButton: (props) => (<RemoveRippleEffect {...props} />
                ),
                tabBarIcon: ({ color }) => <Icon4 name='search' color={color} size={30} />
@@ -336,16 +346,6 @@ const App = () => {
    })
 
 
-   // const EditProfileStack = createNativeStackNavigator({
-   //    screens: {
-   //       ThreadsProfile1: ThreadsProfile,
-
-   //    },
-   //    screenOptions: {
-   //       headerShown: false,
-   //    }
-   // })
-
 
 
 
@@ -373,6 +373,7 @@ const App = () => {
       <Provider store={store}>
          <PersistGate loading={null} persistor={persistor}>
             <Navigation />
+            {/* <PracticeScreen /> */}
          </PersistGate>
       </Provider>
    )
