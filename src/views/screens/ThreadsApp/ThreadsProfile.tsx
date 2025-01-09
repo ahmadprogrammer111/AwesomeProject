@@ -18,15 +18,20 @@ import Icon5 from 'react-native-vector-icons/FontAwesome'
 
 const ThreadsProfile = () => {
 
+
+
     const navigation = useNavigation<any>()
+
     const [modalVisible, setModalVisible] = useState(false)
+    const [modalVisible1, setModalVisible1] = useState(false)
+
 
     const dispatch = useDispatch()
     const user = useSelector((state: any) => state.user.user)
     const Email = useSelector((state: any) => state.user.tempMail)
 
     const [data, setData] = useState<any>()
-    // const [email, setEmail] = useState('')
+    const [post, setPost] = useState('')
     const [myThreads, setMyThreads] = useState<any>()
 
 
@@ -52,24 +57,31 @@ const ThreadsProfile = () => {
 
             console.log('Data ======>', data)
 
-            // .onSnapshot(documentSnapshot => {
-            //     console.log('Threads  at Profile: ', documentSnapshot)
-            //     const threadsArray = documentSnapshot.docs.map(item => item.data())
-            //     if (threadsArray) {
-            //         console.log('my array', threadsArray)
-            //         setMyThreads(threadsArray)
-            //     }
-            // })
-            // return () => subscriber();
-            // } else {
-            //     console.log('from Homescreen. There is no value in Email: ', Email)
-            //     console.error('Error consoled', Error)
-            // }
-
         } catch (error) {
             console.log('Err fetching Email from redux-persist', error)
         }
     }
+
+
+    // const editPost = async (id: any, thread: any) => {
+
+    //     setPost(thread)
+    //     console.log('P O S T ------>', post)
+    //     setModalVisible1(true)
+    //     try {
+    //         await firestore()
+    //             .collection('Threads')
+    //             .doc(id)
+    //             .update({
+    //                 thread: post
+    //             })
+    //         console.log("Post E D I T E D successfuly")
+    //         getDataFromFirebase()
+    //     } catch (error) {
+    //         console.log("Error", error)
+    //     }
+    // }
+
 
     const deletePost = async (id: any) => {
         try {
@@ -194,7 +206,10 @@ const ThreadsProfile = () => {
                         <Text style={styles.text}>{item.thread}</Text>
                     </View>
                     <TouchableOpacity onPress={() => deletePost(item.id)}>
-                        <Icon4 name='more-horizontal' size={22} color='red' />
+                        <Icon4 name='delete' size={22} color='red' />
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => navigation.navigate('ThreadsCreate', { id: item.id, propThread: item.thread })}>
+                        <Icon name='pencil' size={22} color='black' />
                     </TouchableOpacity>
                 </View>
             </TouchableOpacity>
@@ -261,6 +276,47 @@ const ThreadsProfile = () => {
             </View>
 
 
+
+            <Modal
+                visible={modalVisible1}
+
+                onRequestClose={() => setModalVisible1(false)}
+                animationType='slide'
+            >
+                <View style={styles.headerContainer}>
+                    <TouchableOpacity onPress={() => {
+                        setModalVisible1(false)
+                        setData(user)
+                    }}
+                    >
+                        <Text style={styles.sideHeaders}>Cancel</Text>
+                    </TouchableOpacity>
+                    <Text style={styles.header}>Edit Post</Text>
+                    <TouchableOpacity onPress={() => {
+                        // updateProfile();
+                        setModalVisible1(false)
+                    }}>
+                        <Text style={[styles.sideHeaders, { fontFamily: 'Nunito-Black' }]}>Save</Text>
+                    </TouchableOpacity>
+                </View>
+
+                <View style={{ backgroundColor: '#d7dbdd', flex: 1 }}>
+                    <View style={{ flex: 0.3 }} />
+
+                    <View style={styles.settingContainer}>
+
+                        <Line width='80%' />
+
+                        <Text style={[styles.title, { marginLeft: 15 }]}>EDit Post</Text>
+                        <TextInput style={[styles.textInput, { marginLeft: 10 }]}
+                            value={post} onChangeText={setPost}
+                            placeholder='Bio here' placeholderTextColor='grey' maxLength={50} multiline={true}
+                        />
+
+                        <Line width='90%' />
+                    </View>
+                </View>
+            </Modal>
 
 
             <Modal

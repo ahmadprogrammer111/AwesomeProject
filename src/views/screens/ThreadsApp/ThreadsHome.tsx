@@ -8,6 +8,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import Icon from 'react-native-vector-icons/Ionicons'
 import Icon2 from 'react-native-vector-icons/Feather'
 import Icon3 from 'react-native-vector-icons/FontAwesome'
+import { LogLevel, OneSignal } from 'react-native-onesignal';
+
 
 
 
@@ -22,7 +24,7 @@ const ThreadsHome = ({ route }: any) => {
     const Email = useSelector((state: any) => state.user.tempMail)
     const user = useSelector((state: any) => state.user.user)
 
-   
+
     const [threads, setThreads] = useState<any>()
 
     useFocusEffect(useCallback(
@@ -49,6 +51,22 @@ const ThreadsHome = ({ route }: any) => {
         },
         [],
     ))
+
+    OneSignal.Debug.setLogLevel(LogLevel.Verbose);
+
+    // OneSignal Initialization
+    OneSignal.initialize("479ae6a7-d38e-4116-88a4-0835ca09a6d4");
+ 
+    // requestPermission will show the native iOS or Android notification permission prompt.
+    // We recommend removing the following code and instead using an In-App Message to prompt for notification permission
+    OneSignal.Notifications.requestPermission(true);
+ 
+    // Method for listening for notification clicks
+    OneSignal.Notifications.addEventListener('click', (event) => {
+       console.log('OneSignal: notification clicked:', event);
+    });
+
+
 
 
     const getDataFromFirebase = () => {
@@ -85,7 +103,7 @@ const ThreadsHome = ({ route }: any) => {
 
     const renderContacts = ({ item }: any) => {
 
-        // console.log(item)
+        
         return (<View style={{}}>
             <TouchableOpacity onPress={() => navigation.navigate('ThreadsDetails', { user: item })}
                 style={styles.main}>
@@ -118,7 +136,6 @@ const ThreadsHome = ({ route }: any) => {
         </View >)
     }
 
-
     return (
         <View style={styles.container}>
             <View style={{ height: '1%' }} />
@@ -126,13 +143,14 @@ const ThreadsHome = ({ route }: any) => {
                 source={require('../../../assets/images/Threads.png')} />
             <View style={{ height: '1%' }} />
 
-            <FlatList
-                data={threads}
-                renderItem={renderContacts}
-                refreshing={isRefreshing}
-                onRefresh={getDataFromFirebase}
-            />
-
+            {isRefreshing ? <View></View> :
+                <FlatList
+                    data={threads}
+                    renderItem={renderContacts}
+                    refreshing={isRefreshing}
+                    onRefresh={getDataFromFirebase}
+                />
+            }
 
         </View>
     )

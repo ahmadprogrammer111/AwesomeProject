@@ -18,6 +18,7 @@ const ThreadsLogin = () => {
     const dispatch = useDispatch()
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
+    const [isloading, setIsloading] = useState(false)
 
     const [isVisible, setIsVisible] = useState(true)
 
@@ -40,6 +41,7 @@ const ThreadsLogin = () => {
 
     const signinwithEmailAndPassword = async () => {
 
+        setIsloading(true)
         console.log('Email:', email);
         console.log('Password:', password);
         if (!email || !password) {
@@ -48,27 +50,16 @@ const ThreadsLogin = () => {
         }
         const Email = () => {
             dispatch(addEmail(email))
-
         }
-
         auth()
             .signInWithEmailAndPassword(email, password)
             .then(() => {
                 Email()
                 console.log('storing Email in async,', email)
-
                 storingEmail(email)
-
                 console.log('User Logged In! sucessfully')
-                // console.log('Navigating to ThreadsHome1 with email:', email);
+                setIsloading(false)
                 navigation.navigate('ThreadsHome1',)
-
-
-
-                //      {
-                //     screen: 'ThreadsHome',
-                //     params: { email: email }
-                // }
             })
             .catch((error) => {
                 if (error.code == 'auth/email-already-in-use') {
@@ -82,7 +73,6 @@ const ThreadsLogin = () => {
                 }
                 console.log(error)
             })
-
     }
 
 
@@ -106,7 +96,7 @@ const ThreadsLogin = () => {
 
 
             <View style={styles.passwordinputcontainer}>
-                <TextInput value={password} onChangeText={setPassword} secureTextEntry={isVisible} maxLength={10} 
+                <TextInput value={password} onChangeText={setPassword} secureTextEntry={isVisible} maxLength={10}
                     style={styles.textinput} placeholder='Password' placeholderTextColor='#a6acaf' />
                 <Pressable onPress={() => setIsVisible(!isVisible)} style={styles.eyeView}>
                     {isVisible ? <Icon name='eye' size={20} color='grey' /> :

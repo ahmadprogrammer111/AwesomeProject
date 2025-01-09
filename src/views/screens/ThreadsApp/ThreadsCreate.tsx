@@ -1,18 +1,45 @@
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
-import React, { useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import Icon from 'react-native-vector-icons/Ionicons'
 import { useSelector } from 'react-redux'
 import firestore from '@react-native-firebase/firestore'
-import { useNavigation } from '@react-navigation/native'
+import { useFocusEffect, useNavigation } from '@react-navigation/native'
 
 
 
-const ThreadsCreate = () => {
+const ThreadsCreate = ({ route }: any) => {
+
+    const { id, propThread, } = route.params || {}
+
+
+    const user = useSelector((state: any) => state.user.user)
+    const Email = useSelector((state: any) => state.user.tempMail)
 
 
     const navigation = useNavigation<any>()
-    const user = useSelector((state: any) => state.user.user)
-    const Email = useSelector((state: any) => state.user.tempMail)
+    const [threadEdit, setThreadEdit] = useState('')
+    const [thread, setThread] = useState('')
+
+
+
+
+
+    useFocusEffect(useCallback(
+        () => {
+            // console.log('empting threads')
+
+            if (propThread !== undefined || '') {
+                setThreadEdit(propThread)
+            } else {
+                setThreadEdit('')
+            }
+        }, [propThread],))
+
+    if (route.params) {
+        console.log('Parameters from profile screen to E D I T the P O S T', route.params, id, propThread)
+    } else {
+        console.log('No route.P A R A M S  from profile')
+    }
 
 
     if (Email) {
@@ -20,7 +47,6 @@ const ThreadsCreate = () => {
     } else {
         console.log('No Email  from redux store')
     }
-    const [thread, setThread] = useState('')
 
     console.log('My thread:::', thread)
 
@@ -54,16 +80,40 @@ const ThreadsCreate = () => {
         )
     }
 
+
+    const updatePost = async () => {
+
+        try {
+            await firestore()
+                .collection('Threads')
+                .doc(id)
+                .update({
+                    thread: threadEdit
+                })
+            console.log("Post E D I T E D successfuly")
+            setThreadEdit('')
+            navigation.navigate('ThreadsProfile1')
+            // getDataFromFirebase()
+        } catch (error) {
+            console.log("Error", error)
+        }
+    }
+
+
     return (
         <View style={styles.container}>
             <View style={styles.headerContainer}>
-                <TouchableOpacity onPress={() => navigation.goBack()}>
+                <TouchableOpacity onPress={() => {
+                    // setThreadEdit('')
+                    // setThread('')
+                    navigation.goBack();
+
+                }}>
                     <Text style={styles.sideHeaders}>Cancel</Text>
                 </TouchableOpacity>
-                <Text style={styles.header}>New Thread</Text>
+                <Text style={styles.header}>{threadEdit !== undefined ? 'Edit Thread' : 'New Thread'}</Text>
                 <TouchableOpacity onPress={() => {
-                    createThread();
-
+                    threadEdit !== undefined ? updatePost() : createThread();
                 }}>
                     <Text style={styles.sideHeaders}>Post</Text>
                 </TouchableOpacity>
@@ -79,9 +129,10 @@ const ThreadsCreate = () => {
                 <View style={styles.threadTextContainer}>
                     <Text style={styles.name}>{user.name}</Text>
                     <TextInput
-                        value={thread}
+                        value={threadEdit !== undefined ? threadEdit : thread}
                         onChangeText={(text) => {
-                            setThread(text)
+
+                            threadEdit !== undefined ? setThreadEdit(text) : setThread(text);
                             Line()
                             text.length > 30 && setLength(text.length / 1.6)
                         }}
