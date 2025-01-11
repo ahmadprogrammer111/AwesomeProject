@@ -70,6 +70,13 @@ import ThreadsSignUp from './views/screens/ThreadsApp/ThreadsSignUp.tsx'
 import ThreadsForgotPass from './views/screens/ThreadsApp/ThreadsForgotPass.tsx'
 import ThreadsSplash from './views/screens/ThreadsApp/ThreadsSplash.tsx'
 import ThreadsSettings from './views/screens/ThreadsApp/ThreadsSettings.tsx'
+import BloodSplashScreen from './views/screens/BloodDonationScreens/BloodSplashScreen.tsx'
+import BloodLogin from './views/screens/BloodDonationScreens/BloodLogin.tsx'
+import BloodMenu from './views/screens/BloodDonationScreens/BloodMenu.tsx'
+import BloodRegister from './views/screens/BloodDonationScreens/BloodRegister.tsx'
+import BloodBankDonorsSearch from './views/screens/BloodDonationScreens/BloodBankDonorsSearch.tsx'
+import BloodBankSearch from './views/screens/BloodDonationScreens/BloodBankSearch.tsx'
+import { DefaultTheme, MD3LightTheme, PaperProvider, ThemeProvider } from 'react-native-paper'
 
 
 
@@ -208,12 +215,6 @@ const App = () => {
    //    screenOptions: { headerShown: false }
    // })
 
-   // Add OneSignal within your App's root component
-   // Add OneSignal within your App's root component
-
-
-   // Remove this method to stop OneSignal Debugging
-
    // const MenuIcon = () => {
    //    return (
    //       <TouchableOpacity onPress={()=> navigation.navigate('ThreadsProfile1' as never)  }>
@@ -222,160 +223,156 @@ const App = () => {
    //    )
    // }
 
-   const RemoveOpacity = (props: any) => {
-      return (
-         <TouchableOpacity {...props} activeOpacity={1} />)
-   }
-   const RemoveRippleEffect = (props: any) => {
-      return (
-         <TouchableOpacity {...props} activeOpacity={0} />)
-   }
+   // const RemoveOpacity = (props: any) => {
+   //    return (
+   //       <TouchableOpacity {...props} activeOpacity={1} />)
+   // }
+   // const RemoveRippleEffect = (props: any) => {
+   //    return (
+   //       <TouchableOpacity {...props} activeOpacity={0} />)
+   // }
 
 
 
 
 
 
-   const stack2 = createNativeStackNavigator({
+   // const stack2 = createNativeStackNavigator({
+   //    screens: {
+   //       ThreadsProfile: ThreadsProfile,
+   //       ThreadsSettings: ThreadsSettings
+   //    },
+   //    screenOptions: {
+   //       headerShown: false,
+   //       // animation:'slide_from_right'
+   //    }
+   // })
+
+
+
+   // const stack3 = createNativeStackNavigator({
+   //    screens: {
+   //       ThreadsHome2: ThreadsHome,
+   //       ThreadsDetails: ThreadsDetails
+   //    },
+   //    screenOptions: {
+   //       headerShown: false,
+   //    }
+   // })
+
+   // const stack4 = createNativeStackNavigator({
+   //    screens: {
+   //       ThreadsSearch1: ThreadsSearch,
+   //       ThreadsDetails: ThreadsDetails
+   //    },
+   //    screenOptions: {
+   //       headerShown: false,
+
+   //       // animation:'slide_from_right'
+   //    }
+   // })
+
+   // const BottomNavigator = createBottomTabNavigator({
+
+   //    screens: {
+   //       ThreadsHome: {
+   //          screen: stack3, options: {
+
+   //             tabBarButton: (props) => (<RemoveRippleEffect {...props} />
+   //             ),
+   //             tabBarIcon: ({ color }) => <Icon6 name='home' color={color} size={30} />
+   //          }
+   //       },
+   //       ThreadsSearch: {
+   //          screen: stack4, options: {
+   //             tabBarButton: (props) => (<RemoveRippleEffect {...props} />
+   //             ),
+   //             tabBarIcon: ({ color }) => <Icon4 name='search' color={color} size={30} />
+   //          }
+   //       },
+   //       ThreadsCreate: {
+   //          screen: ThreadsCreate, options: {
+   //             tabBarButton: (props) => (<RemoveOpacity {...props} />
+   //             ),
+   //             tabBarIcon: ({ color }) => <ThreadsCreateIcon color={color} />
+   //          }
+   //       },
+   //       ThreadsFeed: {
+   //          screen: ThreadsFeed, options: {
+   //             tabBarButton: (props) => (<RemoveRippleEffect {...props} />
+   //             ),
+   //             tabBarIcon: ({ color }) => <Icon7 name='heart-half' color={color} size={27} />
+   //          }
+   //       },
+   //       ThreadsProfile1: {
+   //          screen: stack2, options: {
+   //             // headerShown: true,
+   //             // headerTitle: "",
+   //             // headerShadowVisible: false,
+   //             // headerRight: () => <MenuIcon />,
+   //             tabBarButton: (props) => (<RemoveRippleEffect {...props} />
+   //             ),
+   //             tabBarIcon: ({ color }) => <Icon7 name='person' color={color} size={25} />
+   //          }
+   //       },
+   //    },
+   //    screenOptions: {
+
+   //       tabBarStyle: {
+   //          paddingTop: 3,
+   //          // borderTopWidth: 0,
+   //          elevation: 0,
+   //          backgroundColor: '#eaeded'
+   //       },
+   //       headerShown: false,
+   //       tabBarShowLabel: false,
+   //       tabBarBackground: () => false,
+   //       tabBarActiveTintColor: 'black',
+   //       tabBarHideOnKeyboard: true,
+   //    },
+   // })
+
+
+   // const MainStack = createNativeStackNavigator({
+   //    screens: {
+   //       ThreadsSplash: ThreadsSplash,
+   //       ThreadsLogin: ThreadsLogin,
+   //       ThreadsSignUp: ThreadsSignUp,
+   //       ThreadsForgotPass: ThreadsForgotPass,
+   //       ThreadsHome1: BottomNavigator
+   //    },
+   //    screenOptions: {
+   //       headerShown: false,
+   //    }
+   // })
+
+   const stack = createNativeStackNavigator({
       screens: {
-         ThreadsProfile: ThreadsProfile,
-         ThreadsSettings: ThreadsSettings
+         BloodSplashScreen: BloodSplashScreen,
+         BloodLogin: BloodLogin,
+         BloodMenu: BloodMenu,
+         BloodRegister: BloodRegister,
+         BloodBankSearch: BloodBankSearch,
+         BloodBankDonorsSearch: BloodBankDonorsSearch,
       },
+
       screenOptions: {
          headerShown: false,
-         // animation:'slide_from_right'
       }
    })
 
+   const Navigation = createStaticNavigation(stack)
 
-
-   const stack3 = createNativeStackNavigator({
-      screens: {
-         ThreadsHome2: ThreadsHome,
-         ThreadsDetails: ThreadsDetails
-      },
-      screenOptions: {
-         headerShown: false,
-      }
-   })
-
-   const stack4 = createNativeStackNavigator({
-      screens: {
-         ThreadsSearch1: ThreadsSearch,
-         ThreadsDetails: ThreadsDetails
-      },
-      screenOptions: {
-         headerShown: false,
-
-         // animation:'slide_from_right'
-      }
-   })
-
-   const BottomNavigator = createBottomTabNavigator({
-
-      screens: {
-         ThreadsHome: {
-            screen: stack3, options: {
-
-               tabBarButton: (props) => (<RemoveRippleEffect {...props} />
-               ),
-               tabBarIcon: ({ color }) => <Icon6 name='home' color={color} size={30} />
-            }
-         },
-         ThreadsSearch: {
-            screen: stack4, options: {
-               tabBarButton: (props) => (<RemoveRippleEffect {...props} />
-               ),
-               tabBarIcon: ({ color }) => <Icon4 name='search' color={color} size={30} />
-            }
-         },
-         ThreadsCreate: {
-            screen: ThreadsCreate, options: {
-               tabBarButton: (props) => (<RemoveOpacity {...props} />
-               ),
-               tabBarIcon: ({ color }) => <ThreadsCreateIcon color={color} />
-            }
-         },
-         ThreadsFeed: {
-            screen: ThreadsFeed, options: {
-               tabBarButton: (props) => (<RemoveRippleEffect {...props} />
-               ),
-               tabBarIcon: ({ color }) => <Icon7 name='heart-half' color={color} size={27} />
-            }
-         },
-         ThreadsProfile1: {
-            screen: stack2, options: {
-               // headerShown: true,
-               // headerTitle: "",
-               // headerShadowVisible: false,
-               // headerRight: () => <MenuIcon />,
-               tabBarButton: (props) => (<RemoveRippleEffect {...props} />
-               ),
-               tabBarIcon: ({ color }) => <Icon7 name='person' color={color} size={25} />
-            }
-         },
-      },
-      screenOptions: {
-
-         tabBarStyle: {
-            paddingTop: 3,
-            // borderTopWidth: 0,
-            elevation: 0,
-            backgroundColor: '#eaeded'
-         },
-         headerShown: false,
-         tabBarShowLabel: false,
-         tabBarBackground: () => false,
-         tabBarActiveTintColor: 'black',
-         tabBarHideOnKeyboard: true,
-      },
-   })
-
-
-   const MainStack = createNativeStackNavigator({
-      screens: {
-         ThreadsSplash: ThreadsSplash,
-         ThreadsLogin: ThreadsLogin,
-         ThreadsSignUp: ThreadsSignUp,
-         ThreadsForgotPass: ThreadsForgotPass,
-         ThreadsHome1: BottomNavigator
-      },
-      screenOptions: {
-         headerShown: false,
-      }
-   })
-
-
-
-
-
-   OneSignal.Debug.setLogLevel(LogLevel.Verbose);
-
-   // OneSignal Initialization
-   OneSignal.initialize("479ae6a7-d38e-4116-88a4-0835ca09a6d4");
-
-   // requestPermission will show the native iOS or Android notification permission prompt.
-   // We recommend removing the following code and instead using an In-App Message to prompt for notification permission
-   OneSignal.Notifications.requestPermission(true);
-
-   // Method for listening for notification clicks
-   OneSignal.Notifications.addEventListener('click', (event) => {
-      console.log('OneSignal: notification clicked:', event);
-   });
-
-
-
-
-
-
-   const Navigation = createStaticNavigation(MainStack)
    return (
+
       <Provider store={store}>
          <PersistGate loading={null} persistor={persistor}>
-            <Navigation />
-            {/* <PracticeScreen /> */}
+            <PaperProvider  >
+               <Navigation />
+            </PaperProvider>
          </PersistGate>
       </Provider>
+
    )
 }
 

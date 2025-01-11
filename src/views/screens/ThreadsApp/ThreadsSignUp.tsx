@@ -31,7 +31,7 @@ const ThreadsSignUp = () => {
 
     const checkEmail = (email: any) => REGEX.test(email)
 
-    const validateEmail = () => setIsValid(checkEmail(email))
+    const validateEmail = () => { setIsValid(checkEmail(email)) }
 
 
 
@@ -247,7 +247,7 @@ const styles = StyleSheet.create({
         borderColor: '#D9D9D9',
         flexDirection: 'row',
         // justifyContent: 'space-between'
-        gap:'90%'
+        gap: '90%'
     },
     textinput: {
         color: 'black',
