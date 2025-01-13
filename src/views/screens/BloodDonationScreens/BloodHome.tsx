@@ -94,10 +94,13 @@ const BloodHome = ({ route }: any) => {
                     <Text style={styles.title}>Blood Bank</Text>
                     <Icon name='align-right' size={20} color='black' style={{ alignSelf: 'flex-end', marginHorizontal: '10%' }} />
 
-
                 </View>
 
-                {isRefreshing ? <View></View> :
+
+
+                <View style={{ height: '2%' }} />
+
+                {isRefreshing ? <View> </View> :
                     <FlatList
                         data={data ? data : bloodArray}
                         renderItem={renderList}
