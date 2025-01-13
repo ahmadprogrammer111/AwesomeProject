@@ -3,12 +3,14 @@
 
 
 import { FlatList, Pressable, StyleSheet, Text, TextInput, Touchable, TouchableOpacity, View } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import LinearGradient from 'react-native-linear-gradient'
 import Icon from 'react-native-vector-icons/Entypo'
 import { Button, Menu, MD3LightTheme } from 'react-native-paper';
 import { CheckBox } from 'react-native-elements'
+import firestore from '@react-native-firebase/firestore'
+import { useFocusEffect, useNavigation } from '@react-navigation/native'
 // import { color } from 'react-native-elements/dist/helpers'
 // import { colors } from 'react-native-elements'
 
@@ -17,9 +19,12 @@ import { CheckBox } from 'react-native-elements'
 
 const BloodBankDonorsSearch = () => {
 
-    const [selectedIndex, setIndex] = useState(9);
+    const [gender, setGender] = useState('');
+    const [name, setName] = useState('')
+    const navigation = useNavigation<any>()
 
 
+    const [data, setData] = useState<any>()
     const bloodGroups = [
         { id: '1', name: 'O+' },
         { id: '2', name: 'O-' },
@@ -63,6 +68,98 @@ const BloodBankDonorsSearch = () => {
         { id: '30', name: 'Chakwal' }
     ];
 
+    
+
+    const getDataFromFirebase = () => {
+
+        try {
+            if (bloodGroup !== '') {
+                const subscriber = firestore()
+                    .collection('BloodUsers')
+                    // .where('name', '==', search) This will not work because it matches the string exactly.
+                    .onSnapshot(documentSnapshot => {
+                        console.log('My array on Search screen', documentSnapshot.docs)
+                        const regex = new RegExp(bloodGroup, 'i')
+
+                        const data: any = documentSnapshot?.docs?.map((item: any) => item.data()).filter((item) => regex.test(item.bloodGroup))
+                        console.log('First test passed', data)
+                        const regex2 = new RegExp(city, 'i')
+
+                        const data1: any = data.map((item: any) => item).filter((item: any) => regex2.test(item.city))
+                        const regex3 = new RegExp(name, 'i')
+
+                        const data2: any = data1.map((item: any) => item).filter((item: any) => regex3.test(item.gender))
+                        console.log('Third  test passed', data2)
+
+                        if (name) {
+                            const data3: any = data2.map((item: any) => item).filter((item: any) => regex3.test(item.name))
+                            console.log('Third  test passed', data3)
+                            setData(data3)
+                            navigation.navigate("BloodHome", { data: data3 })
+                        } else {
+
+                            if (data2) {
+                                console.log('my array', JSON.stringify(data2))
+                                console.log('Only Threads', data.map((item: any) => item.thread))
+                                setData(data2)
+                                navigation.navigate("BloodHome", { data: data2 })
+
+                            }
+                        }
+
+                        
+
+
+                    })
+                return () => subscriber();
+            } else {
+                console.log('Search is empty---->', bloodGroup)
+            }
+
+        } catch (error) {
+            console.log('Errorin catch from bloodBank Search')
+        }
+    }
+
+
+
+    // const getDataFromFirebase = async () => {
+    //     try {
+    //         const data = await firestore()
+    //             .collection('BloodUsers')
+    //             .where('bloodGroup', '==', bloodGroup)
+    //             .where('city', '==', city)
+    //             .where('name', '==', name)
+    //             .orderBy('createdAt', 'desc')
+    //             .get()
+    //         const threadsArray = data.docs.map(item => ({
+    //             id: item.id,
+    //             ...item.data()
+    //         }))
+    //         console.log("Array ===>", threadsArray)
+
+    //         if (threadsArray) {
+    //             console.log('my array', threadsArray)
+
+    //             // console.log('Mappped Arrrrrrrraaaaay', maped)
+    //             setData(threadsArray)
+    //             navigation.navigate('BloodHome')
+    //         }
+
+    //         console.log('Data ======>', data)
+
+    //     } catch (error) {
+    //         console.log('Err fetching data-------->', error)
+    //     }
+    // }
+
+
+    // useFocusEffect(useCallback(() => {
+    //     console.log('Use Focus')
+    //     getDataFromFirebase()
+    // },
+    //     [],
+    // ))
 
     const [visible, setVisible] = useState(false);
     const [visible1, setVisible1] = useState(false);
@@ -75,11 +172,6 @@ const BloodBankDonorsSearch = () => {
     const [bloodGroup, setBloodGroup] = useState('')
     const [city, setCity] = useState('')
 
-    useEffect(() => {
-        console.log(bloodGroup, city)
-
-
-    }, [bloodGroup, city])
 
 
 
@@ -171,7 +263,7 @@ const BloodBankDonorsSearch = () => {
                     <View style={{ height: '6%' }} />
                     <View style={{ marginHorizontal: '10%', }}>
                         <Text style={styles.text}>Enter Name</Text>
-                        <TextInput style={styles.input} />
+                        <TextInput style={styles.input} placeholder='Enter Name (Optional)' value={name} onChangeText={setName} />
                     </View>
                     <View style={styles.line} />
 
@@ -179,11 +271,11 @@ const BloodBankDonorsSearch = () => {
 
 
                     <View style={styles.genderOption}>
-                        <Pressable onPress={() => setIndex(0)}
+                        <Pressable onPress={() => setGender('male')}
                             style={styles.subGenderOptions}>
                             <CheckBox
-                                checked={selectedIndex === 0}
-                                onPress={() => setIndex(0)}
+                                checked={gender == 'male'}
+                                onPress={() => setGender('male')}
                                 checkedIcon="dot-circle-o"
                                 checkedColor='black'
                                 uncheckedColor='grey'
@@ -192,15 +284,15 @@ const BloodBankDonorsSearch = () => {
                             <Text style={{
                                 fontSize: 25,
 
-                                color: selectedIndex == 0 ? 'black' : 'grey',
+                                color: gender == 'male' ? 'black' : 'grey',
                             }}>Male</Text>
                         </Pressable>
 
-                        <Pressable onPress={() => setIndex(1)}
+                        <Pressable onPress={() => setGender('female')}
                             style={styles.subGenderOptions}>
                             <CheckBox
-                                checked={selectedIndex === 1}
-                                onPress={() => setIndex(1)}
+                                checked={gender == 'female'}
+                                onPress={() => setGender('female')}
                                 checkedColor='black'
                                 uncheckedColor='grey'
                                 checkedIcon="dot-circle-o"
@@ -209,12 +301,13 @@ const BloodBankDonorsSearch = () => {
 
                             <Text style={{
                                 fontSize: 25,
-                                color: selectedIndex == 1 ? 'black' : 'grey',
+                                color: gender == 'female' ? 'black' : 'grey',
                             }}>Female</Text>
                         </Pressable>
                     </View>
                     <View style={{ height: '5%' }} />
-                    <TouchableOpacity style={styles.button}>
+                    <TouchableOpacity onPress={() => getDataFromFirebase()}
+                        style={styles.button} >
                         <Text style={styles.buttonText}>Search Bloodbank</Text>
                     </TouchableOpacity>
                 </View>

@@ -77,6 +77,9 @@ import BloodRegister from './views/screens/BloodDonationScreens/BloodRegister.ts
 import BloodBankDonorsSearch from './views/screens/BloodDonationScreens/BloodBankDonorsSearch.tsx'
 import BloodBankSearch from './views/screens/BloodDonationScreens/BloodBankSearch.tsx'
 import { DefaultTheme, MD3LightTheme, PaperProvider, ThemeProvider } from 'react-native-paper'
+import BloodProfile from './views/screens/BloodDonationScreens/BloodProfile.tsx'
+import BloodHome from './views/screens/BloodDonationScreens/BloodHome.tsx'
+import { ConnectivityProvider } from './components/BloofComponent/BloodConnection.tsx'
 
 
 
@@ -348,12 +351,15 @@ const App = () => {
 
    const stack = createNativeStackNavigator({
       screens: {
+         // BloodHome: BloodHome,
          BloodSplashScreen: BloodSplashScreen,
          BloodLogin: BloodLogin,
          BloodMenu: BloodMenu,
          BloodRegister: BloodRegister,
          BloodBankSearch: BloodBankSearch,
          BloodBankDonorsSearch: BloodBankDonorsSearch,
+         BloodProfile: BloodProfile,
+         BloodHome: BloodHome
       },
 
       screenOptions: {
@@ -364,15 +370,15 @@ const App = () => {
    const Navigation = createStaticNavigation(stack)
 
    return (
-
-      <Provider store={store}>
-         <PersistGate loading={null} persistor={persistor}>
-            <PaperProvider  >
-               <Navigation />
-            </PaperProvider>
-         </PersistGate>
-      </Provider>
-
+      <ConnectivityProvider>
+         <Provider store={store}>
+            <PersistGate loading={null} persistor={persistor}>
+               <PaperProvider  >
+                  <Navigation />
+               </PaperProvider>
+            </PersistGate>
+         </Provider>
+      </ConnectivityProvider>
    )
 }
 

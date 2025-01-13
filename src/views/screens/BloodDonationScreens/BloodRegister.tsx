@@ -2,19 +2,30 @@ import { Alert, FlatList, Pressable, StyleSheet, Text, TextInput, Touchable, Tou
 import React, { useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import LinearGradient from 'react-native-linear-gradient'
-import { Button, CheckBox } from 'react-native-elements'
+import { CheckBox, Button as Button1 } from 'react-native-elements'
 import { useDispatch } from 'react-redux'
 import Auth from '@react-native-firebase/auth'
-import { useNavigation } from '@react-navigation/native'
-import Firestore from '@react-native-firebase/firestore'
-import { DefaultTheme, Menu } from 'react-native-paper'
+import { CommonActions, useNavigation } from '@react-navigation/native'
+import firestore from '@react-native-firebase/firestore'
+import { DefaultTheme, Dialog, Menu, Portal, Button } from 'react-native-paper'
 import Icon from 'react-native-vector-icons/Entypo'
+import { addEmail, addUser } from '../../../redux/Slices/BloodSlice'
 
 
 
 const BloodRegister = () => {
 
-
+    const dispatch = useDispatch()
+    const bloodGroups = [
+        { id: '1', name: 'O+' },
+        { id: '2', name: 'O-' },
+        { id: '3', name: 'A+' },
+        { id: '4', name: 'A-' },
+        { id: '5', name: 'B+' },
+        { id: '6', name: 'B-' },
+        { id: '7', name: 'AB+' },
+        { id: '8', name: 'AB-' },
+    ];
     const cities = [
         { id: '1', name: 'Lahore' },
         { id: '2', name: 'Rawalpindi' },
@@ -48,7 +59,8 @@ const BloodRegister = () => {
         { id: '30', name: 'Chakwal' }
     ];
 
-
+    const [open, setOpen] = useState(false);
+    const [error, setError] = useState('')
     const navigation = useNavigation();
     const [gender, setGender] = useState<string>('');
     const [donor, setDonor] = useState(false);
@@ -57,30 +69,32 @@ const BloodRegister = () => {
     const [password, setPassword] = useState('');
     const [city, setCity] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [bloodGroup, setBloodGroup] = useState('')
 
     const [lineLayout, setLineLayout] = useState<any>(null)
-
-
+    const [lineLayout1, setLineLayout1] = useState<any>(null)
 
     const [visible, setVisible] = useState(false);
+    const [visible1, setVisible1] = useState(false);
 
 
-    // const reg = new RegExp('name', 'i')
+
     const REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     const checkEmail = (email: any) => REGEX.test(email)
-    // const validateEmail = () => { checkEmail(email) }
 
 
 
-
-    const renderItem = ({ item }: any) => {
+    const renderItem = ({ item }: any, type: any) => {
         return (<TouchableOpacity
             style={styles.cityItem}
             onPress={() => {
-
-                setCity(item.name);
-                setVisible(false)
-
+                if (type == 'blood Group') {
+                    setBloodGroup(item.name);
+                    setVisible(false)
+                } else if (type == 'city') {
+                    setCity(item.name);
+                    setVisible1(false)
+                }
             }}
         >
             <Text style={styles.cityText}>{item.name}</Text>
@@ -89,10 +103,39 @@ const BloodRegister = () => {
     }
 
 
+    const renderMenu = (data: any, type: string, visible: boolean, setVisible: any, lineLayout: any) => {
+        return (
+            <Menu
+                visible={visible}
+                anchorPosition='bottom'
+                onDismiss={() => setVisible(false)}
+                anchor={<Pressable style={styles.section} onPress={() => setVisible(true)}
+                >
+                    <Text style={styles.text}>Select {type}</Text>
+
+                    <Icon name='chevron-small-down' size={33} color='black' />
+                </Pressable>}
+
+                contentStyle={{
+                    width: lineLayout ? lineLayout.width : '80%',
+                    left: lineLayout ? lineLayout.x : 0,
+                    maxHeight: 200
+                }}
+            >
+
+                <FlatList
+                    data={data}
+                    renderItem={({ item }) => renderItem({ item }, type)}
+                />
+            </Menu>
+        )
+    }
+
+
+const bio= ''
+
     const createUserWithEmailAndPassword = async () => {
-
-
-        // validateEmail()
+        setIsLoading(true)
 
         if (!checkEmail(email)) {
             Alert.alert('Enter Correct Email!!');
@@ -102,43 +145,58 @@ const BloodRegister = () => {
             console.log('Email:', email);
             console.log('Email:', name);
             console.log('Password:', password);
-            if (!email || !password || !name || !city || !gender || !donor) {
+            if (!email || !password || !name || !city || !gender || !bloodGroup) {
                 console.log('Email or Password or Name is empty');
                 Alert.alert('Email or Password is empty');
                 return setIsLoading(false);
             }
             else {
+                dispatch(addEmail(email))
                 Auth()
                     .createUserWithEmailAndPassword(email, password)
                     .then(() => {
                         console.log('User Signed Up! sucessfully')
-                        Firestore()
+                        firestore()
                             .collection('BloodUsers')
-                            .doc(email)
-                            .set({
+                            .add({
                                 name: name,
+                                bio: bio,
                                 email: email,
                                 password: password,
                                 city: city,
                                 gender: gender,
-                                type: donor ? 'donor' : 'recepient'
-
+                                type: donor ? 'donor' : 'recepient',
+                                bloodGroup: bloodGroup,
+                                createdAt: new Date().toISOString()
                             });
 
                         setIsLoading(false)
-                        navigation.navigate('ThreadsHome1' as never)
+                        navigation.dispatch(
+                            CommonActions.reset({
+                                index: 0,
+                                routes: [{ name: 'BloodMenu' }],
+                            })
+                        );
                     })
                     .catch((error) => {
                         if (error.code == 'auth/email-already-in-use') {
                             console.log('That email address is already in use!')
+                            // Alert.alert('That email address is already in use!')
                         }
                         if (error.code == 'auth/invalid-email') {
                             console.log('That email address is invalid!!')
+                            // Alert.alert('That email address is invalid!!')
                         }
                         if (error.code == 'auth/operation-not-allowed') {
                             console.log('The email is disabled by the owner of the app.')
+                            // Alert.alert('The email is disabled by the owner of the app.')
                         }
+
+                        const err = `Pls check your Email:${error.code}: ${error.message}`
+                        setError(err)
+                        setOpen(true)
                         console.log(error)
+
                     })
             }
         }
@@ -151,132 +209,126 @@ const BloodRegister = () => {
         <SafeAreaView style={styles.safeArea}>
             <LinearGradient colors={['#DB2424', '#EA7960']} style={styles.container}>
 
-                <View style={{ height: '8%' }} />
+                {isLoading ? <View><Button1 title="Solid" type="solid" loading /></View> :
 
-                <Text style={styles.title}>Registration</Text>
+                    <>
+                        <View style={{ height: '8%' }} />
 
-                <View style={{ height: '5%' }} />
+                        <Text style={styles.title}>Registration</Text>
 
-                <View style={styles.inputContainer}>
+                        <View style={{ height: '5%' }} />
 
-                    <TextInput
-                        value={name}
-                        onChangeText={setName}
-                        placeholder='Name'
-                        placeholderTextColor='#D8BFBF'
-                        style={styles.input}
-                    />
+                        <View style={styles.inputContainer}>
 
-
-                    <TextInput
-                        value={email}
-                        onChangeText={setEmail}
-                        placeholder='Email'
-                        placeholderTextColor='#D8BFBF'
-                        style={styles.input}
-                    />
-
-                    <TextInput
-                        value={password}
-                        onChangeText={setPassword}
-                        placeholder='Password'
-                        placeholderTextColor='#D8BFBF'
-                        style={styles.input}
-                    />
+                            <TextInput
+                                value={name}
+                                onChangeText={setName}
+                                placeholder='Name'
+                                placeholderTextColor='#D8BFBF'
+                                style={styles.input}
+                            />
 
 
+                            <TextInput
+                                value={email}
+                                onChangeText={setEmail}
+                                placeholder='Email'
+                                placeholderTextColor='#D8BFBF'
+                                style={styles.input}
+                            />
 
-                </View>
-                <View style={{ height: '2%' }} />
+                            <TextInput
+                                value={password}
+                                onChangeText={setPassword}
+                                placeholder='Password'
+                                placeholderTextColor='#D8BFBF'
+                                style={styles.input}
+                            />
+                        </View>
+                        <View style={{ height: '2%' }} />
 
-                <Menu
-                    visible={visible}
-                    anchorPosition='bottom'
-                    onDismiss={() => setVisible(false)}
-                    anchor={<Pressable onLayout={(e) => setLineLayout(e.nativeEvent.layout)} style={styles.section} onPress={() => setVisible(true)}
-                    >
-                        <Text style={styles.text}>Select City</Text>
 
-                        <Icon name='chevron-small-down' size={33} color='black' />
-                    </Pressable>}
+                        {renderMenu(bloodGroups, 'blood Group', visible, setVisible, lineLayout)}
+                        <Text style={styles.text1}>{bloodGroup ? bloodGroup : null}</Text>
 
-                    contentStyle={{
-                        width: lineLayout ? lineLayout.width : null,
-                        left: lineLayout ? lineLayout.x : 0,
-                        maxHeight: 200,
-                        backgroundColor: 'white'
-                    }}
-                >
+                        <View style={styles.line} onLayout={(event) => setLineLayout(event.nativeEvent.layout)} />
 
-                    <FlatList
-                        style={styles.flatList}
-                        data={cities}
-                        renderItem={renderItem}
-                    />
-                </Menu>
-                <Text style={styles.text1}>{city ? city : null}</Text>
+                        <View style={{ height: '3%' }} />
 
-                <View style={styles.line} />
-                <View style={{ height: '2%' }} />
-                <Text style={styles.gender}>Select Gender</Text>
+                        {renderMenu(cities, 'city', visible1, setVisible1, lineLayout1)}
+                        <Text style={styles.text1}>{city ? city : null}</Text>
+                        <View style={styles.line} onLayout={(event) => setLineLayout1(event.nativeEvent.layout)} />
 
-                <View style={styles.genderOption}>
-                    <Pressable onPress={() => setGender('male')}
-                        style={styles.subGenderOptions}>
-                        <CheckBox
-                            // title='Male'
-                            checked={gender == 'male'}
-                            onPress={() => setGender('male')}
-                            checkedIcon="dot-circle-o"
-                            checkedColor='black'
-                            uncheckedColor='#D8BFBF'
-                            uncheckedIcon="circle-o"
-                        />
-                        <Text style={{
-                            fontSize: 25,
-                            color: gender == 'male' ? 'black' : '#FFFFFF',
-                        }}>Male</Text>
-                    </Pressable>
 
-                    <Pressable onPress={() => setGender('female')}
-                        style={styles.subGenderOptions}>
-                        <CheckBox
-                            checked={gender === 'female'}
-                            onPress={() => setGender('female')}
-                            checkedColor='black'
-                            uncheckedColor='#D8BFBF'
-                            checkedIcon="dot-circle-o"
-                            uncheckedIcon="circle-o"
-                        />
 
-                        <Text style={{
-                            fontSize: 25,
-                            color: gender == 'female' ? 'black' : '#FFFFFF',
-                        }}>Female</Text>
-                    </Pressable>
-                </View>
+                        <View style={{ height: '2%' }} />
+                        <Text style={styles.gender}>Select Gender</Text>
 
-                <Pressable onPress={() => setDonor(!donor)}
-                    style={styles.checkBoxContainer}>
-                    <CheckBox
-                        checked={donor}
-                        onPress={() => setDonor(!donor)}
-                        iconType="material-icons"
-                        checkedIcon="check-box"
-                        uncheckedIcon="check-box-outline-blank"
-                        uncheckedColor='black'
-                        checkedColor="#D8BFBF"
-                        size={40}
-                    />
-                    <Text style={styles.genderText}>Be A Donor</Text>
-                </Pressable>
-                <View style={{ height: '3%' }} />
-                <TouchableOpacity style={styles.button}>
-                    <Text style={styles.buttonText}>Create Account</Text>
-                </TouchableOpacity>
+                        <View style={styles.genderOption}>
+                            <Pressable onPress={() => setGender('male')}
+                                style={styles.subGenderOptions}>
+                                <CheckBox
+                                    // title='Male'
+                                    checked={gender == 'male'}
+                                    onPress={() => setGender('male')}
+                                    checkedIcon="dot-circle-o"
+                                    checkedColor='black'
+                                    uncheckedColor='#D8BFBF'
+                                    uncheckedIcon="circle-o"
+                                />
+                                <Text style={{
+                                    fontSize: 25,
+                                    color: gender == 'male' ? 'black' : '#FFFFFF',
+                                }}>Male</Text>
+                            </Pressable>
+
+                            <Pressable onPress={() => setGender('female')}
+                                style={styles.subGenderOptions}>
+                                <CheckBox
+                                    checked={gender === 'female'}
+                                    onPress={() => setGender('female')}
+                                    checkedColor='black'
+                                    uncheckedColor='#D8BFBF'
+                                    checkedIcon="dot-circle-o"
+                                    uncheckedIcon="circle-o"
+                                />
+                                <Text style={{
+                                    fontSize: 25,
+                                    color: gender == 'female' ? 'black' : '#FFFFFF',
+                                }}>Female</Text>
+                            </Pressable>
+                        </View>
+                        <Pressable onPress={() => setDonor(!donor)}
+                            style={styles.checkBoxContainer}>
+                            <CheckBox
+                                checked={donor}
+                                onPress={() => setDonor(!donor)}
+                                iconType="material-icons"
+                                checkedIcon="check-box"
+                                uncheckedIcon="check-box-outline-blank"
+                                uncheckedColor='black'
+                                checkedColor="#D8BFBF"
+                                size={40}
+                            />
+                            <Portal>
+                                <Dialog visible={open} onDismiss={() => setOpen(false)} >
+                                    <Dialog.Title>Alert!</Dialog.Title>
+                                    <Dialog.Content>
+                                        <Text>{error}</Text>
+                                    </Dialog.Content>
+                                    <Dialog.Actions>
+                                        <Button onPress={() => setOpen(false)}>ok</Button>
+                                    </Dialog.Actions>
+                                </Dialog>
+                            </Portal>
+                            <Text style={styles.genderText}>Be A Donor</Text>
+                        </Pressable>
+                        <View style={{ height: '3%' }} />
+                        <TouchableOpacity style={styles.button} onPress={() => createUserWithEmailAndPassword()}>
+                            <Text style={styles.buttonText}>Create Account</Text>
+                        </TouchableOpacity>
+                    </>}
             </LinearGradient>
-
-
         </SafeAreaView>
     )
 }

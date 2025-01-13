@@ -1,17 +1,105 @@
-import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View, } from 'react-native'
-import React from 'react'
+import { ActivityIndicator, Pressable, StyleSheet, Text, TouchableOpacity, View, } from 'react-native'
+import React, { useCallback, useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import LinearGradient from 'react-native-linear-gradient'
-import { Button, Image } from 'react-native-elements'
+import { Button, Dialog, Image, Tooltip } from 'react-native-elements'
 import { Touchable } from 'react-native'
-import { useNavigation } from '@react-navigation/native'
+import { CommonActions, useFocusEffect, useNavigation } from '@react-navigation/native'
+import { useNetInfo } from '@react-native-community/netinfo'
+import { addEventListener } from "@react-native-community/netinfo";
+import { Snackbar } from 'react-native-paper'
+import { getAuth } from '@react-native-firebase/auth'
 
 
 const BloodSplashScreen = () => {
+
+
+
+
+    const [initializing, setInitializing] = useState(true);
+    const [user, setUser] = useState();
+
+    const [connected, setConnected] = useState<boolean | undefined>(false)
+    const [open, setOpen] = useState(false)
+
+    function onAuthStateChanged(user: any) {
+        setUser(user);
+        console.log('User Found', user)
+        if (initializing) setInitializing(false);
+        // console.log(initializing)
+    }
+
+
+    useEffect(() => {
+        const subscriber = getAuth().onAuthStateChanged(onAuthStateChanged);
+        return subscriber;
+    }, [initializing]);
+
+
+    useFocusEffect(useCallback(
+        () => {
+            if (!initializing && connected) {
+                setTimeout(() => {
+                    if (user) {
+                        navigation.dispatch(
+                            CommonActions.reset({
+                                index: 0,
+                                routes: [{ name: 'BloodMenu' }],
+                            })
+                        );
+                    }
+
+                }, 2000);
+            }
+        }, [initializing, connected],
+    ))
+
+
+
+
     const navigation = useNavigation<any>()
+
+
+    useFocusEffect(
+        useCallback(
+            () => {
+                checkNetwork()
+                setOpen(false)
+                if (connected == false) {
+                    setOpen(true)
+                } else if (connected == true) {
+                    setOpen(false)
+                }
+            }, [connected],
+        ))
+
+    const checkNetwork = () => {
+        const unsubscribe = addEventListener(state => {
+            console.log("Connection type", state.type);
+            console.log("Is connected?", state.isConnected);
+            console.log("Details :?", state.details);
+            console.log("Is Wifi enabled?", state.isWifiEnabled);
+            if (!state.isWifiEnabled || !state.isConnected) {
+                console.log('network Not  Connnected!!')
+                setOpen(true)
+                setConnected(state.isConnected as any)
+                console.log('Connected  Value-------->', connected)
+
+            } else if (state.isWifiEnabled || state.isConnected) {
+                console.log('newrok Connnected !!!!')
+                setOpen(false)
+                setConnected(state.isConnected)
+                console.log('ConnectedValue-------->', connected)
+            }
+        });
+        unsubscribe();
+    }
+
+
 
     return (
         <SafeAreaView style={styles.safeArea}>
+
             <LinearGradient colors={['#DB2424', '#EA7960']} style={styles.container}>
                 <View style={{ height: '5%' }} />
 
@@ -30,15 +118,39 @@ const BloodSplashScreen = () => {
 
                 <View style={{ height: '15%' }} />
 
-                <TouchableOpacity onPress={() => navigation.navigate('BloodLogin')}
-                    style={styles.buttonContainer}>
-                    <Text style={styles.buttonText}>Start</Text>
-                </TouchableOpacity>
+                <Pressable
+                    style={[styles.buttonContainer, { backgroundColor: !connected ? '#ed8b71' : '#D20D0D' }]}
+                    onPress={() => {
+                        setOpen(true)
+                        if (connected == true) {
+                            setOpen(false)
+                        }
+                    }}
+
+                >
+                    <TouchableOpacity
+                        onPress={() => navigation.navigate('BloodLogin')}
+                        disabled={!connected}
+
+                    >
+                        <Text style={styles.buttonText}>Start</Text>
+
+                    </TouchableOpacity>
+                </Pressable>
 
 
-
-
-
+                <Snackbar
+                    visible={open}
+                    onDismiss={() => setOpen(false)}
+                    action={{
+                        label: 'Refresh',
+                        onPress: () => {
+                            checkNetwork()
+                            
+                        },
+                    }}>
+                    No Internet Connection
+                </Snackbar>
 
             </LinearGradient>
         </SafeAreaView>
@@ -79,7 +191,7 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
     },
     buttonContainer: {
-        backgroundColor: '#D20D0D',
+        // backgroundColor: '#D20D0D',
 
         borderRadius: 40,
         borderWidth: 2,

@@ -1,14 +1,67 @@
 import { ActivityIndicator, StyleSheet, Text, View, Image, Touchable, TouchableOpacity } from 'react-native'
-import React from 'react'
+import React, { useCallback, useContext, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import LinearGradient from 'react-native-linear-gradient'
 import { TouchEventType } from 'react-native-gesture-handler/lib/typescript/web/interfaces'
-import { useNavigation } from '@react-navigation/native'
-// import { Image } from 'react-native-elements'
+import { useFocusEffect, useNavigation } from '@react-navigation/native'
+import firestore, { doc } from '@react-native-firebase/firestore'
+import { addUser } from '../../../redux/Slices/BloodSlice'
+import { useDispatch, useSelector } from 'react-redux'
+import { underDampedSpringCalculations } from 'react-native-reanimated/lib/typescript/animation/springUtils'
+import { Dialog, Portal } from 'react-native-paper'
+import Icon from 'react-native-vector-icons/Ionicons'
+import { ConnectivityContext } from '../../../components/BloofComponent/BloodConnection'
+
 
 
 const BloodMenu = () => {
+
+
+    const isConnected = useContext(ConnectivityContext);
+
     const navigation = useNavigation<any>()
+    const Email = useSelector((state: any) => state.blood.bloodMail)
+    const dispatch = useDispatch()
+    const [open, setOpen] = useState(false)
+
+
+
+    if (isConnected == false) {
+        setOpen(true)
+    }
+    const getDataFromFirebase = () => {
+        console.log('Email at BloodMenu', Email)
+        try {
+            if (Email) {
+                const subscriber = firestore()
+                    .collection('BloodUsers')
+                    .where('email', '==', Email)
+                    .onSnapshot(documentSnapshot => {
+                        console.log('BloodApp Data  at BloodMenu ______________>:', documentSnapshot.docs)
+                        const threadsArray = documentSnapshot.docs.map(item => item.data())
+                        if (threadsArray) {
+                            console.log('userData is being Transferred to redux ', threadsArray)
+                            dispatch(addUser(threadsArray[0]))
+                        }
+                    })
+
+                return () => subscriber();
+            } else {
+                console.log('from Homescreen. There is no value in Email: ', Email)
+            }
+
+        } catch (error) {
+            console.log('Err fetching Email from redux-persist', error)
+        }
+    }
+
+    useFocusEffect(useCallback(
+        () => {
+            getDataFromFirebase()
+        },
+        [],
+    ))
+
 
     return (
 
@@ -16,20 +69,22 @@ const BloodMenu = () => {
             <LinearGradient colors={['#DB2424', '#EA7960']} style={styles.container}>
 
                 <View style={styles.mainContainer}>
+                    <View style={styles.header}>
+                        <Text style={styles.title}>Blood Bank</Text>
 
-                    <Text style={styles.title}>Blood Bank</Text>
-
+                        <Icon name='person-circle' size={50} color='grey' onPress={() => navigation.navigate('BloodProfile')} />
+                    </View>
                     <View style={{ height: '2%' }} />
 
                     <TouchableOpacity
-                        onPress={() => navigation.navigate('BloodRegister')}
+                        onPress={() => navigation.navigate('BloodHome')}
                         style={styles.bloodBankContainer}>
                         <Image source={require('../../../assets/images/bloodBank.png')}
                             resizeMode='contain'
                             style={styles.bloodBank}
                             onError={(e) => console.log(e.nativeEvent.error)}
                         />
-                        <Text style={styles.text}>Registration</Text>
+                        <Text style={styles.text}>Blood Bank</Text>
                     </TouchableOpacity>
 
                     <View style={{ height: '2%' }} />
@@ -106,5 +161,12 @@ const styles = StyleSheet.create({
         // alignSelf: 'center',
         alignItems: 'center',
         flexDirection: 'column'
+    },
+    header: {
+        marginTop: '5%',
+        flexDirection: 'row',
+        gap: 60,
+        width: '50%',
+        // alignSelf: 'flex-end'
     }
 })

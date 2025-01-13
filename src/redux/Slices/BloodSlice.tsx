@@ -6,7 +6,7 @@ const initialState = {
     bloodMail: '',
 }
 
-const userSlice = createSlice({
+const BloodSlice = createSlice({
     name: 'user',
     initialState,
     reducers: {
@@ -29,5 +29,5 @@ const userSlice = createSlice({
 })
 
 
-export const { addUser, addEmail } = userSlice.actions
-export default userSlice.reducer
+export const { addUser, addEmail } = BloodSlice.actions
+export default BloodSlice.reducer
