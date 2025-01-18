@@ -70,7 +70,7 @@ import ThreadsSignUp from './views/screens/ThreadsApp/ThreadsSignUp.tsx'
 import ThreadsForgotPass from './views/screens/ThreadsApp/ThreadsForgotPass.tsx'
 import ThreadsSplash from './views/screens/ThreadsApp/ThreadsSplash.tsx'
 import ThreadsSettings from './views/screens/ThreadsApp/ThreadsSettings.tsx'
-import BloodSplashScreen from './views/screens/BloodDonationScreens/BloodSplashScreen.tsx'
+import BloodSplashScreen from './views/screens/BloodDonationScreens/BloodSplash.tsx'
 import BloodLogin from './views/screens/BloodDonationScreens/BloodLogin.tsx'
 import BloodMenu from './views/screens/BloodDonationScreens/BloodMenu.tsx'
 import BloodRegister from './views/screens/BloodDonationScreens/BloodRegister.tsx'
@@ -79,7 +79,9 @@ import BloodBankSearch from './views/screens/BloodDonationScreens/BloodBankSearc
 import { DefaultTheme, MD3LightTheme, PaperProvider, ThemeProvider } from 'react-native-paper'
 import BloodProfile from './views/screens/BloodDonationScreens/BloodProfile.tsx'
 import BloodHome from './views/screens/BloodDonationScreens/BloodHome.tsx'
-import { ConnectivityProvider } from './components/BloofComponent/BloodConnection.tsx'
+import { ConnectivityProvider } from './Context/Connection.tsx'
+import { SafeAreaProvider } from 'react-native-safe-area-context'
+import BloodStart from './views/screens/BloodDonationScreens/BloodSplash.tsx'
 
 
 
@@ -352,9 +354,10 @@ const App = () => {
    const stack = createNativeStackNavigator({
       screens: {
          // BloodHome: BloodHome,
-         BloodSplashScreen: BloodSplashScreen,
+         // BloodSplashScreen: BloodSplashScreen,
+         BloodStart: BloodStart,
          BloodLogin: BloodLogin,
-         BloodMenu: BloodMenu,
+         // BloodMenu: BloodMenu,
          BloodRegister: BloodRegister,
          BloodBankSearch: BloodBankSearch,
          BloodBankDonorsSearch: BloodBankDonorsSearch,
@@ -369,16 +372,20 @@ const App = () => {
 
    const Navigation = createStaticNavigation(stack)
 
+
    return (
-      <ConnectivityProvider>
-         <Provider store={store}>
-            <PersistGate loading={null} persistor={persistor}>
-               <PaperProvider  >
-                  <Navigation />
-               </PaperProvider>
-            </PersistGate>
-         </Provider>
-      </ConnectivityProvider>
+      <SafeAreaProvider>
+         <ConnectivityProvider>
+            <Provider store={store}>
+               <PersistGate loading={null} persistor={persistor}>
+                  <PaperProvider  >
+                     {/* < PracticeScreen /> */}
+                     <Navigation />
+                  </PaperProvider>
+               </PersistGate>
+            </Provider>
+         </ConnectivityProvider>
+      </SafeAreaProvider>
    )
 }
 

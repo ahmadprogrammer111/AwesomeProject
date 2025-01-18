@@ -1,19 +1,30 @@
-import { Alert, FlatList, Pressable, StyleSheet, Text, TextInput, Touchable, TouchableOpacity, View } from 'react-native'
-import React, { useState } from 'react'
+import { Alert, FlatList, Image, Pressable, ScrollView, StyleSheet, Text, TextInput, Touchable, TouchableOpacity, View } from 'react-native'
+import React, { useCallback, useContext, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import LinearGradient from 'react-native-linear-gradient'
 import { CheckBox, Button as Button1 } from 'react-native-elements'
 import { useDispatch } from 'react-redux'
 import Auth from '@react-native-firebase/auth'
-import { CommonActions, useNavigation } from '@react-navigation/native'
+import { CommonActions, useFocusEffect, useNavigation } from '@react-navigation/native'
 import firestore from '@react-native-firebase/firestore'
 import { DefaultTheme, Dialog, Menu, Portal, Button } from 'react-native-paper'
 import Icon from 'react-native-vector-icons/Entypo'
+import Icon2 from 'react-native-vector-icons/Ionicons'
+
+
 import { addEmail, addUser } from '../../../redux/Slices/BloodSlice'
+import { ConnectivityContext } from '../../../Context/Connection'
+import { colors, textColors } from '../../../components/BloodComponent/BloodColors'
+import { color } from 'react-native-elements/dist/helpers'
+import BloodInput from '../../../components/BloodComponent/BloodInput'
 
 
 
 const BloodRegister = () => {
+    const { connected, checkNetwork, setOpen } = useContext(ConnectivityContext);
+
+
+
 
     const dispatch = useDispatch()
     const bloodGroups = [
@@ -59,9 +70,9 @@ const BloodRegister = () => {
         { id: '30', name: 'Chakwal' }
     ];
 
-    const [open, setOpen] = useState(false);
+    const [OpenDialog, setOpenDialog] = useState(false);
     const [error, setError] = useState('')
-    const navigation = useNavigation();
+    const navigation = useNavigation<any>();
     const [gender, setGender] = useState<string>('');
     const [donor, setDonor] = useState(false);
     const [name, setName] = useState('');
@@ -85,6 +96,7 @@ const BloodRegister = () => {
 
 
     const renderItem = ({ item }: any, type: any) => {
+
         return (<TouchableOpacity
             style={styles.cityItem}
             onPress={() => {
@@ -131,14 +143,19 @@ const BloodRegister = () => {
         )
     }
 
-
-const bio= ''
+    const phone = ''
+    const age = ''
+    // const bio = ''
+    const address = ''
 
     const createUserWithEmailAndPassword = async () => {
         setIsLoading(true)
 
         if (!checkEmail(email)) {
-            Alert.alert('Enter Correct Email!!');
+            // Alert.alert('Enter Correct Email!!');
+            setError('Enter Correct Email!!')
+            setOpenDialog(true)
+
             setIsLoading(false);
             return;
         } else {
@@ -147,7 +164,8 @@ const bio= ''
             console.log('Password:', password);
             if (!email || !password || !name || !city || !gender || !bloodGroup) {
                 console.log('Email or Password or Name is empty');
-                Alert.alert('Email or Password is empty');
+                setOpenDialog(true)
+                // Alert.alert('Email or Password is empty');
                 return setIsLoading(false);
             }
             else {
@@ -160,10 +178,13 @@ const bio= ''
                             .collection('BloodUsers')
                             .add({
                                 name: name,
-                                bio: bio,
+                                // bio: bio,
                                 email: email,
                                 password: password,
                                 city: city,
+                                age: age,
+                                address: address,
+                                phone: phone,
                                 gender: gender,
                                 type: donor ? 'donor' : 'recepient',
                                 bloodGroup: bloodGroup,
@@ -174,7 +195,7 @@ const bio= ''
                         navigation.dispatch(
                             CommonActions.reset({
                                 index: 0,
-                                routes: [{ name: 'BloodMenu' }],
+                                routes: [{ name: 'BloodProfile' }],
                             })
                         );
                     })
@@ -191,10 +212,10 @@ const bio= ''
                             console.log('The email is disabled by the owner of the app.')
                             // Alert.alert('The email is disabled by the owner of the app.')
                         }
-
                         const err = `Pls check your Email:${error.code}: ${error.message}`
                         setError(err)
-                        setOpen(true)
+                        setOpenDialog(true)
+                        // setOpen(true)
                         console.log(error)
 
                     })
@@ -207,44 +228,44 @@ const bio= ''
     return (
 
         <SafeAreaView style={styles.safeArea}>
-            <LinearGradient colors={['#DB2424', '#EA7960']} style={styles.container}>
+            <View style={styles.container}>
 
-                {isLoading ? <View><Button1 title="Solid" type="solid" loading /></View> :
+
+                {isLoading ? <View style={{ alignItems: 'center', justifyContent: 'center', flex: 1 }}><Button1 title="Solid" type="solid" containerStyle={{ backgroundColor: 'red' }} loading /></View> :
 
                     <>
-                        <View style={{ height: '8%' }} />
-
-                        <Text style={styles.title}>Registration</Text>
-
-                        <View style={{ height: '5%' }} />
-
-                        <View style={styles.inputContainer}>
-
-                            <TextInput
-                                value={name}
-                                onChangeText={setName}
-                                placeholder='Name'
-                                placeholderTextColor='#D8BFBF'
-                                style={styles.input}
-                            />
+                        <View style={{ height: '2%' }} />
+                        <Image source={require('../../../assets/images/bloodBg.png')} resizeMode='stretch' style={{ position: 'absolute', height: '22%', width: '100%' }} />
 
 
-                            <TextInput
-                                value={email}
-                                onChangeText={setEmail}
-                                placeholder='Email'
-                                placeholderTextColor='#D8BFBF'
-                                style={styles.input}
-                            />
+                        <View style={styles.headingContainer}>
+                            <TouchableOpacity onPress={() => navigation.goBack()}>
+                                <Icon2 name='arrow-back-outline' size={25} color={textColors.secondary} style={{}} adjustsFontSizeToFit={true} />
+                            </TouchableOpacity>
+                            <View style={{ height: '15%' }} />
+                            <Text style={styles.title}>Create account</Text>
+                            <Text style={styles.headingText}>And Recieve or Donate Blood</Text>
 
-                            <TextInput
-                                value={password}
-                                onChangeText={setPassword}
-                                placeholder='Password'
-                                placeholderTextColor='#D8BFBF'
-                                style={styles.input}
-                            />
                         </View>
+                        {/* <View style={{ height: '1%' }} /> */}
+
+                        <View style={styles.boxContainer}>
+                            <Text style={styles.headingText}>Credentials</Text>
+                        </View>
+
+                        <View style={{ height: '2%' }} />
+
+                        <Text style={styles.inputTitle}>Name</Text>
+                        <BloodInput placeHolder='eg. Harry' value={name} setValue={setName} />
+                        <View style={{ height: '2%' }} />
+
+                        <Text style={styles.inputTitle}>Email</Text>
+                        <BloodInput placeHolder='example@email.com' value={email} setValue={setEmail} />
+                        <View style={{ height: '2%' }} />
+
+                        <Text style={styles.inputTitle}>Password</Text>
+                        <BloodInput placeHolder='eg. /1^5dau9*' value={password} setValue={setPassword} />
+
                         <View style={{ height: '2%' }} />
 
 
@@ -253,16 +274,14 @@ const bio= ''
 
                         <View style={styles.line} onLayout={(event) => setLineLayout(event.nativeEvent.layout)} />
 
-                        <View style={{ height: '3%' }} />
+                        <View style={{ height: '2%' }} />
 
                         {renderMenu(cities, 'city', visible1, setVisible1, lineLayout1)}
                         <Text style={styles.text1}>{city ? city : null}</Text>
                         <View style={styles.line} onLayout={(event) => setLineLayout1(event.nativeEvent.layout)} />
 
-
-
                         <View style={{ height: '2%' }} />
-                        <Text style={styles.gender}>Select Gender</Text>
+                        <Text style={styles.inputTitle}>Select Gender</Text>
 
                         <View style={styles.genderOption}>
                             <Pressable onPress={() => setGender('male')}
@@ -272,14 +291,16 @@ const bio= ''
                                     checked={gender == 'male'}
                                     onPress={() => setGender('male')}
                                     checkedIcon="dot-circle-o"
-                                    checkedColor='black'
-                                    uncheckedColor='#D8BFBF'
+                                    containerStyle={{ width: '20%' }}
+                                    size={15}
+                                    checkedColor={colors.primary}
+                                    uncheckedColor={colors.tertiary}
                                     uncheckedIcon="circle-o"
                                 />
-                                <Text style={{
-                                    fontSize: 25,
-                                    color: gender == 'male' ? 'black' : '#FFFFFF',
-                                }}>Male</Text>
+                                <Text style={[styles.text, {
+
+                                    color: gender == 'male' ? textColors.primary : textColors.tertiary,
+                                }]}>Male</Text>
                             </Pressable>
 
                             <Pressable onPress={() => setGender('female')}
@@ -287,17 +308,32 @@ const bio= ''
                                 <CheckBox
                                     checked={gender === 'female'}
                                     onPress={() => setGender('female')}
-                                    checkedColor='black'
-                                    uncheckedColor='#D8BFBF'
+                                    size={15}
+                                    containerStyle={{ width: '20%' }}
+                                    checkedColor={colors.primary}
+                                    uncheckedColor={colors.tertiary}
                                     checkedIcon="dot-circle-o"
                                     uncheckedIcon="circle-o"
                                 />
-                                <Text style={{
-                                    fontSize: 25,
-                                    color: gender == 'female' ? 'black' : '#FFFFFF',
-                                }}>Female</Text>
+                                <Text style={[styles.text, {
+                                    color: gender == 'female' ? textColors.primary : textColors.tertiary,
+                                }]}>Female</Text>
                             </Pressable>
                         </View>
+
+
+                        <Portal>
+                            <Dialog visible={OpenDialog} onDismiss={() => setOpenDialog(false)}>
+                                <Dialog.Title>Alert!</Dialog.Title>
+                                <Dialog.Content>
+                                    <Text>{error}</Text>
+                                </Dialog.Content>
+                                <Dialog.Actions>
+                                    <Button onPress={() => setOpenDialog(false)}>ok</Button>
+                                </Dialog.Actions>
+                            </Dialog>
+                        </Portal>
+
                         <Pressable onPress={() => setDonor(!donor)}
                             style={styles.checkBoxContainer}>
                             <CheckBox
@@ -306,29 +342,26 @@ const bio= ''
                                 iconType="material-icons"
                                 checkedIcon="check-box"
                                 uncheckedIcon="check-box-outline-blank"
-                                uncheckedColor='black'
-                                checkedColor="#D8BFBF"
-                                size={40}
+                                checkedColor={colors.primary}
+                                uncheckedColor={colors.tertiary}
+                                size={25}
                             />
-                            <Portal>
-                                <Dialog visible={open} onDismiss={() => setOpen(false)} >
-                                    <Dialog.Title>Alert!</Dialog.Title>
-                                    <Dialog.Content>
-                                        <Text>{error}</Text>
-                                    </Dialog.Content>
-                                    <Dialog.Actions>
-                                        <Button onPress={() => setOpen(false)}>ok</Button>
-                                    </Dialog.Actions>
-                                </Dialog>
-                            </Portal>
-                            <Text style={styles.genderText}>Be A Donor</Text>
+                            <Text style={styles.text}>Be A Donor</Text>
                         </Pressable>
+
                         <View style={{ height: '3%' }} />
-                        <TouchableOpacity style={styles.button} onPress={() => createUserWithEmailAndPassword()}>
-                            <Text style={styles.buttonText}>Create Account</Text>
+
+                        <TouchableOpacity
+                            onPress={() => createUserWithEmailAndPassword()}
+                            style={styles.buttonContainer}>
+                            <Text style={styles.buttonText}>Register</Text>
                         </TouchableOpacity>
+
                     </>}
-            </LinearGradient>
+
+            </View>
+
+            {/* </LinearGradient> */}
         </SafeAreaView>
     )
 }
@@ -343,10 +376,13 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     title: {
-        alignSelf: 'center',
-        color: '#FFFFFF',
+        // marginLeft: -5,
+        marginTop: -10,
+        marginBottom: -5,
+        fontFamily: "Lexend-Regular",
+        color: 'white',
         fontSize: 30,
-        fontWeight: 'bold'
+
     },
     input: {
         // backgroundColor: 
@@ -366,23 +402,32 @@ const styles = StyleSheet.create({
     genderOption: {
         flexDirection: 'row',
         marginHorizontal: 20,
+        alignItems: 'center',
+        // justifyContent: 'center',
+        // backgroundColor: 'red',
+        width: '80%',
+        marginTop: -7
+        // height: '5%'
     },
     subGenderOptions: {
         flexDirection: 'row',
         alignItems: 'center',
+        justifyContent: 'center',
+        // backgroundColor: 'red',
+
+        width: '25%'
 
     },
-    genderText: {
-        fontSize: 25,
-        color: '#FFFFFF',
-        // marginHorizontal: '10%',
-    },
+
     checkBoxContainer: {
+        marginVertical: -10,
+        // height: '5%',
         flexDirection: 'row',
         marginHorizontal: '4%',
         alignItems: 'center',
         // backgroundColor: 'red',
-        width: '55%'
+        width: '55%',
+        // backgroundColor: 'red',
     },
     button: {
         backgroundColor: '#D9D9D9',
@@ -393,10 +438,6 @@ const styles = StyleSheet.create({
         marginHorizontal: '12%',
         elevation: 10
     },
-    buttonText: {
-        color: '#000000',
-        fontSize: 25,
-    },
     cityItem: {
         padding: 10,
     },
@@ -406,28 +447,83 @@ const styles = StyleSheet.create({
     },
     section: {
         padding: 0,
-        // backgroundColor: 'red',
         marginHorizontal: '10%',
+        width: '80%',
         flexDirection: 'row',
         justifyContent: 'space-between',
-        // marginHorizontal: 30,
+
     },
     text: {
-        fontSize: 19,
-        color: 'black',
+        // marginHorizontal: '10%',
+        color: textColors.primary,
+        fontFamily: 'Lexend-Regular',
+        fontSize: 16,
     },
     flatList: {
         backgroundColor: 'white',
     },
     line: {
-        height: '0.3%',
+        height: '0.2%',
         backgroundColor: '#000000',
         width: '80%',
         alignSelf: 'center'
     },
     text1: {
-        fontSize: 19,
-        color: 'black',
+        color: textColors.tertiary,
+        fontFamily: 'Lexend-Regular',
+        fontSize: 16,
         marginHorizontal: '10%'
+    },
+    headingContainer: {
+        // backgroundColor: 'red',
+        alignSelf: 'flex-start',
+        marginHorizontal: '8%',
+        height: '15%'
+    },
+    headingText: {
+        fontFamily: "Lexend-Regular",
+        color: 'white',
+        // marginHorizontal: '10%',
+        letterSpacing: 0.25,
+
+        fontSize: 14.8,
+        // alignSelf: 'center'
+    },
+    boxContainer: {
+        backgroundColor: colors.side,
+        width: '24%',
+        borderRadius: 7,
+        alignItems: 'center',
+        marginHorizontal: '15%',
+        padding: 4,
+    },
+    inputTitle: {
+        marginHorizontal: '10%',
+        color: textColors.primary,
+        fontFamily: 'Lexend-Regular',
+        fontSize: 18,
+    },
+    buttonContainer: {
+        backgroundColor: colors.primary,
+        justifyContent: 'center',
+        borderRadius: 6,
+        // borderWidth: 2,
+        // borderColor: '#FFFCFC',
+        alignSelf: 'center',
+        elevation: 10,
+        width: '80%',
+        paddingTop: 0,
+        paddingBottom: 5,
+        // paddingVertical: 5,
+        height: '6%',
+        // borderWidth: 20,
+        // borderRadius: 20,
+    },
+    buttonText: {
+        fontFamily: 'Lexend-Regular',
+        fontSize: 25,
+        color: 'white',
+        textAlign: 'center',
+        alignSelf: 'center'
     },
 })

@@ -1,28 +1,39 @@
-import { Modal, StyleSheet, Text, TouchableOpacity, View, TextInput, Image, FlatList, Pressable } from 'react-native'
-import React, { useCallback, useEffect, useState } from 'react'
+import { Modal, StyleSheet, Text, TouchableOpacity, View, TextInput, Image, FlatList, Pressable, ActivityIndicator } from 'react-native'
+import React, { useCallback, useContext, useEffect, useState } from 'react'
 import Icon from 'react-native-vector-icons/FontAwesome'
 import Icon2 from 'react-native-vector-icons/Ionicons'
 import Icon4 from 'react-native-vector-icons/Entypo'
+import Icon5 from 'react-native-vector-icons/FontAwesome5'
+import Icon7 from 'react-native-vector-icons/AntDesign'
+
+import { Button as Button1 } from 'react-native-elements'
+
 import { CommonActions, DrawerActions, useFocusEffect, useNavigation } from '@react-navigation/native'
 import { useDispatch, useSelector } from 'react-redux'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import firestore from '@react-native-firebase/firestore'
 import { launchImageLibrary } from 'react-native-image-picker'
 import { addEmail, addUser } from '../../../redux/Slices/userSlice'
-import Icon3 from 'react-native-vector-icons/Ionicons'
+import Icon3 from 'react-native-vector-icons/MaterialCommunityIcons'
 
-import Icon6 from 'react-native-vector-icons/MaterialCommunityIcons'
+import Icon6 from 'react-native-vector-icons/MaterialIcons'
 
 import auth from '@react-native-firebase/auth'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import LinearGradient from 'react-native-linear-gradient'
 import { Button, Menu, PaperProvider } from 'react-native-paper'
+import { ConnectivityContext } from '../../../Context/Connection'
+import { colors, textColors } from '../../../components/BloodComponent/BloodColors'
+import { BottomSheet, ListItem } from 'react-native-elements'
 
 
 
 
 
 const BloodProfile = () => {
+
+    const { connected, checkNetwork, setOpen } = useContext(ConnectivityContext);
+
 
     const bloodGroups = [
         { id: '1', name: 'O+' },
@@ -73,10 +84,11 @@ const BloodProfile = () => {
 
     const dispatch = useDispatch()
 
+    const [isLoading, setisLoading] = useState(false)
     const user = useSelector((state: any) => state.blood.bloodUser)
     const Email = useSelector((state: any) => state.blood.bloodMail)
-
-
+    console.log('WEmail for redux', Email)
+    const [isVisibleSheet, setIsVisibleSheet] = useState(false);
 
     const [visible, setVisible] = useState(false);
     const [visible1, setVisible1] = useState(false);
@@ -86,6 +98,7 @@ const BloodProfile = () => {
 
     const [lineLayout, setLineLayout] = useState<any>(null)
     const [lineLayout1, setLineLayout1] = useState<any>(null)
+
     const [city, setCity] = useState('');
 
     const [data, setData] = useState<any>()
@@ -93,6 +106,7 @@ const BloodProfile = () => {
     const [myThreads, setMyThreads] = useState<any>()
 
     const getDataFromFirebase = async () => {
+        // setisLoading(true)
         try {
             const data = await firestore()
                 .collection('BloodUsers')
@@ -109,10 +123,11 @@ const BloodProfile = () => {
                 console.log('my array', threadsArray)
                 // const maped = threadsArray.map((item) => item)
                 // console.log('Mappped Arrrrrrrraaaaay', maped)
-                setMyThreads(threadsArray[0])
+                setData(threadsArray[0])
+                // setisLoading(false)
             }
 
-            console.log('Data ======>', data)
+            // console.log('Data ======>', data)
 
         } catch (error) {
             console.log('Err fetching data-------->', error)
@@ -141,16 +156,16 @@ const BloodProfile = () => {
             console.log('user from redux', user)
             setData(user)
         }
-    }, [])
+    }, [user])
 
 
     const setName = (Value: string) => {
         setData({ ...data, name: Value });
         console.log(' Edited name:', data?.name)
     }
-    const setBio = (Value: string) => {
-        setData({ ...data, bio: Value });
-        console.log(' Edited Bio:', data?.bio)
+    const setAddress = (Value: string) => {
+        setData({ ...data, address: Value });
+        console.log(' Edited Address:', data?.address)
     }
     const updateBloodGroup = (Value: string) => {
         setData({ ...data, bloodGroup: Value });
@@ -160,9 +175,17 @@ const BloodProfile = () => {
         setData({ ...data, city: Value });
         console.log(' Edited CIty:', data?.city)
     }
+    const updatePhone = (Value: string) => {
+        setData({ ...data, phone: Value });
+        console.log(' Edited phone:', data?.phone)
+    }
+    const updateAge = (Value: string) => {
+        setData({ ...data, age: Value });
+        console.log(' Edited Age:', data?.age)
+    }
 
     const updateProfile = async () => {
-
+        // setisLoading(true)
         const filteredData = await firestore()
             .collection('BloodUsers')
             .where('email', '==', Email)
@@ -172,20 +195,28 @@ const BloodProfile = () => {
         console.log('filtereed data,', filteredData)
         const updateFields = {
             name: data?.name,
-            bio: data?.bio,
+            address: data?.address,
             bloodGroup: data?.bloodGroup,
-            city: data?.city
+            city: data?.city,
+            age: data?.age,
+            phone: data?.phone,
         }
 
-        dispatch(addUser(data))
 
         filteredData.forEach((document) => {
             const currentDocId = firestore().collection('BloodUsers').doc(document.id)
             batch.update(currentDocId, updateFields)
         })
-        console.log('Updating the profile on Threads Collection pls wait...')
 
-        batch.commit()
+
+        batch.commit().then(() => {
+            console.log('Updating the profile on BloodPrfile Collection pls wait...')
+            dispatch(addUser(data))
+            setData(data)
+            // setisLoading(false)
+
+
+        })
 
 
     }
@@ -239,14 +270,13 @@ const BloodProfile = () => {
 
     const renderMenu = (data: any, type: string, visible: boolean, setVisible: any, lineLayout: any) => {
         return (
-            // <ConnectivityContext.Provider value={isCone}
+
             <Menu
                 visible={visible}
                 anchorPosition='bottom'
                 onDismiss={() => setVisible(false)}
                 anchor={<Pressable style={styles.section} onPress={() => setVisible(true)}
                 >
-
                     <Text style={styles.text}>Select {type}</Text>
                     <Icon4 name='chevron-small-down' size={33} color='black' />
                 </Pressable>}
@@ -268,195 +298,258 @@ const BloodProfile = () => {
 
 
 
+
     return (
         <SafeAreaView style={styles.safeArea}>
+
             <PaperProvider>
-                <LinearGradient colors={['#DB2424', '#EA7960']} style={styles.container}>
+                <View style={styles.container}>
 
-                    <View style={{ flex: 0.05 }} />
-                    <Menu
-                        visible={visible3}
-                        onDismiss={() => setVisible3(false)}
-                        anchorPosition='bottom'
-                        contentStyle={{
-                            left: menuLayout ? menuLayout.x - 150 : 0,
-                            maxHeight: 200
-                        }}
-                        anchor={<TouchableOpacity onPress={() => setVisible3(true)} onLayout={(e) => setMenuLayout(e.nativeEvent.layout)}
-                            style={{ alignSelf: 'flex-end', marginHorizontal: 30, marginVertical: 10, }}
-                        >
-                            <Icon name='align-right' size={30} color='black' />
-                        </TouchableOpacity>
-                        }>
-                        <Menu.Item onPress={() => { signOut() }} leadingIcon='logout' title='Logout' />
+                    {isLoading ? <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}><Button1 title="Solid" type="solid" loading buttonStyle={{ backgroundColor: colors.primary }} /></View> :
+                        <>
+                            <View style={styles.personInfo}>
+                                <View style={{ height: '5%' }} />
 
-                    </Menu>
 
-                    <LinearGradient
-                        colors={['#b0b0b0', '#b8b8b8', '#d1cece']}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 0 }}
-                        style={styles.personInfo}>
+                                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', height: '35%' }}>
 
-                        <View>
-                            <Text style={styles.originalName}>{data?.name}</Text>
-                            <Text style={styles.name}>{data?.email}</Text>
-                        </View>
-                        <Icon2 name='person-circle' size={60} color='grey' />
-
-                    </LinearGradient>
-                    <View style={{ height: '2%' }} />
-
-                    <View style={styles.detailContainer}>
-                        <Text style={{ color: '#616a6b', }}>{data?.bio}</Text>
-                        <Text style={{ color: '#cacfd2', }}>3 Followers</Text>
-                    </View>
-
-                    <View style={{ height: "3%" }} />
-
-                    <View style={styles.buttonContainer}>
-                        <TouchableOpacity onPress={() =>
-                            setModalVisible(true)
-                        }
-                            style={[styles.button]}>
-                            <Text style={styles.buttonText}>Edit Profile</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            style={[styles.button]}>
-                            <Text style={styles.buttonText}>Share Profile</Text>
-                        </TouchableOpacity>
-                    </View>
-
-                    <Modal
-                        visible={modalVisible}
-                        transparent={true}
-                        onRequestClose={() => setModalVisible(false)}
-                        animationType='slide'
-                    ><PaperProvider>
-                            <View style={{ height: '20%' }} />
-
-                            <LinearGradient
-                                colors={['#f4eeee', '#949494', '#900C3F']}
-                                start={{ x: 0, y: 0 }}
-                                end={{ x: 1, y: 0 }}
-                                style={styles.settingContainer}>
-
-                                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                                    <View>
-                                        <Text style={[styles.title, { marginLeft: 15 }]}>Name</Text>
-                                        <TextInput style={[styles.textInput1, { marginLeft: 10 }]}
-                                            value={data?.name} onChangeText={(Text) => setName(Text)}
-                                            placeholder='Name' placeholderTextColor='grey' maxLength={20}
-                                        />
-                                    </View>
-                                    <TouchableOpacity
-                                        style={{ position: 'absolute', right: 10, top: -10 }}>
-                                        <Icon2 name='person-circle' size={60} color='grey' />
+                                    <TouchableOpacity onPress={() => navigation.navigate('BloodHome')}
+                                        style={styles.iconContainer}>
+                                        <Icon2 name='arrow-back-outline' size={23} color={colors.contrast} />
                                     </TouchableOpacity>
-                                </View>
 
-                                <Line width='80%' />
-
-                                <View style={{ height: '3%' }} />
-
-                                <Text style={[styles.title, { marginLeft: 15 }]}>Bio</Text>
-
-                                <TextInput style={[styles.textInput, { marginLeft: 10 }]}
-                                    value={data?.bio} onChangeText={(Text) => setBio(Text)}
-                                    placeholder='Bio here' placeholderTextColor='grey' maxLength={50} multiline={true}
-                                />
-                                <Line width='90%' />
-                                <View style={{ height: '3%' }} />
-
-                                {renderMenu(bloodGroups, 'blood Group', visible, setVisible, lineLayout)}
-                                <Text style={styles.text1}>{bloodGroup ? bloodGroup : null}</Text>
-
-                                <View style={styles.line} onLayout={(event) => setLineLayout(event.nativeEvent.layout)} />
-
-                                <View style={{ height: '3%' }} />
-
-                                {renderMenu(cities, 'city', visible1, setVisible1, lineLayout1)}
-
-                                <Text style={styles.text1}>{city ? city : null}</Text>
-
-                                <View style={styles.line} onLayout={(event) => setLineLayout1(event.nativeEvent.layout)} />
-
-                                <View style={{ height: '10%' }} />
-
-                                <View style={styles.buttonContainer2}>
-
-                                    <TouchableOpacity onPress={() => setModalVisible(false)}
-                                        style={styles.gradientContainer}
-                                    >
-                                        <Text style={styles.buttonText2}>Cancel</Text>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity
-                                        onPress={() => {
-                                            updateProfile()
-                                            setModalVisible(false)
-
+                                    <Menu
+                                        visible={visible3}
+                                        onDismiss={() => setVisible3(false)}
+                                        anchorPosition='bottom'
+                                        contentStyle={{
+                                            left: menuLayout ? menuLayout.x - 50 : 0,
+                                            maxHeight: 200
                                         }}
-                                        style={styles.gradientContainer}
-                                    >
-                                        <Text style={styles.buttonText2}>Save</Text>
-                                    </TouchableOpacity>
+                                        anchor={<TouchableOpacity onPress={() => setVisible3(true)} onLayout={(e) => setMenuLayout(e.nativeEvent.layout)}
+                                            style={styles.menuIconContainer}
+                                        >
+                                            <Icon name='align-right' size={23} color={colors.contrast} />
+                                        </TouchableOpacity>
+                                        }>
+                                        <Menu.Item onPress={() => { signOut() }} leadingIcon='logout' title='Logout' />
+                                    </Menu>
 
                                 </View>
-                            </LinearGradient>
-                        </PaperProvider>
-                    </Modal>
 
+                                <Text style={styles.heading}>Profile</Text>
 
+                                <View style={{ height: '15%' }} />
 
-                    <View style={{ alignItems: 'flex-start', flexDirection: 'row', marginBottom: 10, marginHorizontal: 30 }}>
-                        <Icon6 name='test-tube' size={30} color='' />
-                        <Text style={styles.threads} >
-                            Data
-                        </Text>
-                    </View>
-                    <Line width='30%' />
+                                <View style={styles.personDataWrapper}>
+                                    <View>
+                                        <Text style={styles.originalName}>{data?.name ?? 'Loading'}</Text>
+                                        <Text style={styles.name} >{data?.email ?? 'Loading'}</Text>
+                                    </View>
 
-
-                    <View style={{ height: '3%' }} />
-
-                    <LinearGradient
-                        colors={['#b0b0b0', '#b8b8b8', '#d1cece']}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 0 }}
-                        style={styles.dataContainer}>
-
-                        <View>
-                            <View style={styles.dataSubContainer}>
-                                <Text style={styles.dt1}>Blood Group:</Text>
-                                <Text style={styles.dt2}>{myThreads?.bloodGroup}</Text>
+                                    <TouchableOpacity style={styles.profileContainer}>
+                                        <Icon3 name='account' size={20} color={colors.contrast} />
+                                    </TouchableOpacity>
+                                </View>
                             </View>
 
-                            <View style={styles.dataSubContainer}>
-                                <Text style={styles.dt1}>City:</Text>
-                                <Text style={styles.dt2}>{myThreads?.city}</Text>
+                            <View style={{ height: '10%' }} />
+
+                            <View style={styles.aboutContainer}>
+                                <View style={{ gap: 20, }}>
+                                    <Text style={styles.name}>Address:</Text>
+                                    <Text style={styles.name}>Age:</Text>
+                                    <Text style={styles.name}>Phone:</Text>
+                                    <Text style={styles.name}>Gender:</Text>
+                                </View>
+
+                                <View style={{ gap: 20, }}>
+                                    <Text style={styles.name}>{data?.address ? data?.address ?? 'loading' : 'PLease add address'}</Text>
+                                    <Text style={styles.name}>{data?.age ? data?.age ?? 'loading' : 'PLease add age'}</Text>
+                                    <Text style={styles.name}>{data?.phone ? data?.phone ?? 'loading' : 'PLease add number'}</Text>
+                                    <Text style={styles.name}>{data?.gender ? data?.gender ?? 'loading' : 'PLease add genderF'}</Text>
+                                </View>
+                                <TouchableOpacity
+                                    onPress={() => setModalVisible(true)}
+                                    style={styles.editIconContainer}>
+                                    <Icon6 name='edit' size={20} color={colors.contrast} />
+                                </TouchableOpacity>
+                                <TouchableOpacity style={styles.shareIconContainer}>
+                                    <Icon5 name='share' size={20} color={colors.contrast} />
+                                </TouchableOpacity>
                             </View>
-                            <View style={styles.dataSubContainer}>
-                                <Text style={styles.dt1}>Gender:</Text>
-                                <Text style={styles.dt2}>{myThreads?.gender}</Text>
 
-                            </View>
-                            <View style={styles.dataSubContainer}>
-                                <Text style={styles.dt1}>Type:</Text>
-                                <Text style={styles.dt2}>{myThreads?.type}</Text>
-
+                            <View style={styles.chipContainer}>
+                                <Text style={styles.chipText}>About</Text>
                             </View>
 
-                        </View>
-                    </LinearGradient>
+                            <View style={{ height: '3%' }} />
+
+                            <View style={{ height: '1%' }} />
+
+                            <View style={{ marginHorizontal: '10%', }}>
+
+                                <Text style={styles.originalName}>Blood Group:</Text>
+
+                                <View style={{ height: '4%' }} />
+
+                                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10, }}>
+                                    <View style={[styles.bloodGroupContainer, { backgroundColor: data?.bloodGroup == 'A+' ? colors.primary : colors.contrast }]}>
+                                        <Text style={[styles.bloodGroup, { color: data?.bloodGroup == 'A+' ? textColors.secondary : textColors.colored }]}>A+</Text>
+                                    </View>
+                                    <View style={[styles.bloodGroupContainer, { backgroundColor: data?.bloodGroup == 'B+' ? colors.primary : colors.contrast }]}>
+                                        <Text style={[styles.bloodGroup, { color: data?.bloodGroup == 'B+' ? textColors.secondary : textColors.colored }]}>B+</Text>
+                                    </View>
+                                    <View style={[styles.bloodGroupContainer, { backgroundColor: data?.bloodGroup == 'AB+' ? colors.primary : colors.contrast }]}>
+                                        <Text style={[styles.bloodGroup, { color: data?.bloodGroup == 'AB+' ? textColors.secondary : textColors.colored }]}>AB+</Text>
+                                    </View>
+                                    <View style={[styles.bloodGroupContainer, { backgroundColor: data?.bloodGroup == 'O+' ? colors.primary : colors.contrast }]}>
+                                        <Text style={[styles.bloodGroup, { color: data?.bloodGroup == 'O+' ? textColors.secondary : textColors.colored }]}>O+</Text>
+                                    </View>
+                                    <View style={[styles.bloodGroupContainer, { backgroundColor: data?.bloodGroup == 'A-' ? colors.primary : colors.contrast }]}>
+                                        <Text style={[styles.bloodGroup, { color: data?.bloodGroup == 'A-' ? textColors.secondary : textColors.colored }]}>A-</Text>
+                                    </View>
+                                    <View style={[styles.bloodGroupContainer, { backgroundColor: data?.bloodGroup == 'B-' ? colors.primary : colors.contrast }]}>
+                                        <Text style={[styles.bloodGroup, { color: data?.bloodGroup == 'B-' ? textColors.secondary : textColors.colored }]}>B-</Text>
+                                    </View>
+                                    <View style={[styles.bloodGroupContainer, { backgroundColor: data?.bloodGroup == 'AB-' ? colors.primary : colors.contrast }]}>
+                                        <Text style={[styles.bloodGroup, { color: data?.bloodGroup == 'Ab-' ? textColors.secondary : textColors.colored }]}>AB-</Text>
+                                    </View>
+                                    <View style={[styles.bloodGroupContainer, { backgroundColor: data?.bloodGroup == 'O-' ? colors.primary : colors.contrast }]}>
+                                        <Text style={[styles.bloodGroup, { color: data?.bloodGroup == 'O-' ? textColors.secondary : textColors.colored }]}>O-</Text>
+                                    </View>
+                                </View>
+                            </View>
 
 
 
 
+                            <View style={{ flexDirection: 'row', gap: '80%', marginHorizontal: '10%', paddingHorizontal: '5%', paddingVertical: '3%', borderWidth: 1.5, borderColor: colors.primary, borderRadius: 10, justifyContent: 'center' }}>
+                                <TouchableOpacity
+                                    onPress={() => navigation.navigate('BloodBankDonorsSearch')}
+                                    style={styles.buttonContainer1}>
+                                    <Text style={styles.buttonText}>Donor</Text>
+                                    <Icon7 name='search1' size={20} color={colors.contrast} style={{ transform: [{ scaleX: -1 }] }} />
+                                </TouchableOpacity>
+
+                                <TouchableOpacity
+                                    onPress={() => navigation.navigate('BloodBankSearch')}
+                                    style={styles.buttonContainer1}>
+                                    <Text style={styles.buttonText}>Recepient</Text>
+                                    <Icon7 name='search1' size={20} color={colors.contrast} style={{ transform: [{ scaleX: -1 }] }} />
+                                </TouchableOpacity>
+                            </View>
+
+                            <View style={{ height: '2%' }} />
+
+                            <TouchableOpacity
+                                onPress={() => navigation.navigate('BloodRegister')}
+                                style={{ width: '80%', backgroundColor: colors.primary, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', padding: '4%', borderRadius: 6, alignSelf: 'center' }}>
+                                <Text style={styles.buttonText}>Add Donor</Text>
+
+                                <Icon7 name='adduser' size={20} color={colors.contrast} style={{ transform: [{ scaleX: -1 }] }} />
 
 
+                            </TouchableOpacity>
 
-                </LinearGradient>
-            </PaperProvider>
+                            <Modal
+                                visible={modalVisible}
+
+                                onRequestClose={() => setModalVisible(false)}
+
+                            ><PaperProvider>
+
+                                    <View style={{ backgroundColor: colors.contrast }}>
+
+                                        <Image source={require('../../../assets/images/bloodBg2.png')} resizeMode='stretch' style={{ height: '25%', width: '100%', position: 'absolute', top: '0%' }} />
+                                        <View style={{ height: '8%' }} />
+
+                                        <TouchableOpacity onPress={() => setModalVisible(false)}
+                                            style={{ marginHorizontal: '8%' }}>
+                                            <Icon2 name='arrow-back-outline' size={23} color={colors.contrast} />
+                                        </TouchableOpacity>
+
+                                        <View style={{ height: '10%' }} />
+
+                                        <View style={{ marginHorizontal: '10%' }}>
+                                            <Text style={styles.title}>Name</Text>
+                                            <TextInput style={[styles.textInput,]}
+                                                value={data?.name} onChangeText={(Text) => setName(Text)}
+                                                placeholder='Name' placeholderTextColor='grey' maxLength={20}
+                                            />
+                                        </View>
+
+                                        <View style={{ height: '3%' }} />
+
+
+                                        <View style={{ marginHorizontal: '10%' }}>
+                                            <Text style={[styles.title,]}>Address</Text>
+                                            <TextInput style={[styles.textInput,]}
+                                                value={data?.address} onChangeText={(Text) => setAddress(Text)}
+                                                placeholder='Add Address' placeholderTextColor='grey' maxLength={20} multiline={true}
+                                            />
+                                        </View>
+                                        <View style={{ height: '3%' }} />
+
+                                        <View style={{ marginHorizontal: '10%' }}>
+                                            <Text style={[styles.title,]}>Age</Text>
+                                            <TextInput style={[styles.textInput,]}
+                                                value={data?.age} onChangeText={(Text) => updateAge(Text)}
+                                                placeholder='Enter age' placeholderTextColor='grey' maxLength={2} multiline={true} keyboardType='number-pad'
+                                            />
+                                        </View>
+
+                                        <View style={{ height: '3%' }} />
+
+
+                                        <View style={{ marginHorizontal: '10%' }}>
+                                            <Text style={[styles.title,]}>Phone number</Text>
+                                            <TextInput style={[styles.textInput,]}
+                                                value={data?.phone} onChangeText={(Text) => updatePhone(Text)}
+                                                placeholder='Add number' placeholderTextColor='grey' maxLength={50} multiline={true} keyboardType='number-pad'
+                                            />
+                                        </View>
+
+                                        <View style={{ height: '3%' }} />
+
+
+                                        {renderMenu(bloodGroups, 'blood Group', visible, setVisible, lineLayout)}
+                                        <Text style={styles.text1}>{bloodGroup ? bloodGroup : data?.bloodGroup}</Text>
+
+                                        <View style={styles.line} onLayout={(event) => setLineLayout(event.nativeEvent.layout)} />
+
+                                        <View style={{ height: '3%' }} />
+
+
+                                        {renderMenu(cities, 'city', visible1, setVisible1, lineLayout1)}
+
+                                        <Text style={styles.text1}>{city ? city : data?.city}</Text>
+
+                                        <View style={styles.line} onLayout={(event) => setLineLayout1(event.nativeEvent.layout)} />
+
+                                        <View style={{ flex: 0.5, }} />
+
+                                        <TouchableOpacity
+                                            onPress={() => {
+                                                updateProfile();
+                                                setModalVisible(false)
+                                                // getDataFromFirebase()
+
+                                            }}
+                                            style={styles.buttonContainer}>
+                                            <Text style={styles.buttonText}>Save</Text>
+                                        </TouchableOpacity>
+
+                                        {/* </View> */}
+                                    </View>
+                                </PaperProvider>
+                            </Modal>
+
+
+                        </>}
+
+                </View >
+            </PaperProvider >
         </SafeAreaView >
     )
 }
@@ -469,7 +562,7 @@ const styles = StyleSheet.create({
     },
     container: {
         flex: 1,
-        backgroundColor: 'white',
+        backgroundColor: colors.contrast,
     },
     gradientContainer: {
 
@@ -492,16 +585,21 @@ const styles = StyleSheet.create({
         height: '20%'
     },
     originalName: {
-        marginTop: 3,
-        color: 'black',
+        // marginTop: 3,
+        color: textColors.primary,
+        fontFamily: 'Lexend-Regular',
         // fontFamily: 'Nunito-Bold',
         fontSize: 18,
     },
     name: {
-        color: '#616a6b',
-        // fontFamily: 'Nunito-Medium',
+
+        color: textColors.primary,
+        fontFamily: 'Lexend-Regular',
         fontSize: 14,
-        // width: '70%',
+        flexWrap: 'wrap',
+        // backgroundColor: 'red',/
+
+        // width: '0%',
     },
     detailContainer: {
         marginHorizontal: 20,
@@ -510,13 +608,16 @@ const styles = StyleSheet.create({
         height: '6%'
     },
     buttonContainer: {
-        // gap: 10,
-        // backgroundColor: 'red',
-
-        marginHorizontal: '5%',
-        flexDirection: 'row',
-        height: '6.5%',
-        justifyContent: 'space-between',
+        backgroundColor: colors.primary,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 6,
+        alignSelf: 'center',
+        elevation: 10,
+        width: '80%',
+        paddingTop: 0,
+        paddingBottom: 5,
+        height: '6%',
     },
     button: {
         // backgroundColor: 'black',
@@ -528,11 +629,7 @@ const styles = StyleSheet.create({
         height: '80%',
         borderWidth: 2,
     },
-    buttonText: {
-        // fontFamily: 'Nunito-Bold',
-        color: 'black',
-        fontSize: 16
-    },
+
     threads: {
         // fontFamily: 'Raleway-SemiBold',
         color: 'black',
@@ -561,28 +658,29 @@ const styles = StyleSheet.create({
         fontSize: 18
     },
     title: {
-        // fontFamily: 'Nunito-Bold',
+        fontFamily: 'Lexend-Regular',
         fontSize: 17,
-        color: 'black',
-        marginLeft: 30,
+        color: textColors.primary,
+        // marginHorizontal: '10%',
     },
     textInput: {
         // backgroundColor: 'red',
         // width: '80%',
         paddingVertical: 0,
-        paddingHorizontal: 8,
-        // fontFamily: 'Nunito-Bold',
-        fontSize: 17,
+        paddingHorizontal: '0.5%',
+        fontFamily: 'Lexend-Regular',
+        borderBottomWidth: 1,
+        fontSize: 15,
         color: 'grey',
     },
     textInput1: {
         // backgroundColor: 'red',
-        width: '390%',
+        // width: '390%',
         paddingVertical: 0,
         paddingHorizontal: 8,
         // fontFamily: 'Nunito-Bold',
         fontSize: 17,
-        color: 'grey',
+        color: textColors.tertiary,
     },
     settingContainer: {
         marginHorizontal: 20,
@@ -627,22 +725,23 @@ const styles = StyleSheet.create({
         gap: 20,
     },
     text: {
-        // width: '100%',
-        color: 'grey',
-        fontSize: 16,
-        // fontFamily: 'Nunito-Medium',
+        color: textColors.primary,
+        fontSize: 18,
+        fontFamily: 'Lexend-Regular'
     },
     personInfo: {
+        // alignItems: 'center',
+        // marginHorizontal: '10%',
+        // flexDirection: 'row',
         elevation: 20,
-        backgroundColor: '#D9D9D9',
-        borderRadius: 15,
-        paddingLeft: 10,
-        borderWidth: 1.5,
-        borderColor: 'grey',
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginHorizontal: 20,
-        alignItems: 'center',
+        borderBottomLeftRadius: 10,
+        borderBottomRightRadius: 10,
+        height: '20%',
+        // justifyContent: 'space-between',
+        // alignItems: 'center',
+        // paddingVertical: '3%',
+        backgroundColor: colors.primary,
+        // marginRight: '10%'
     },
     buttonText2: {
         fontSize: 20,
@@ -678,26 +777,175 @@ const styles = StyleSheet.create({
         padding: 10,
     },
     cityText: {
-        fontSize: 16,
-        color: '#000',
+        fontSize: 12,
+        color: textColors.primary,
+        fontFamily: 'Lexend-Regular'
     },
     section: {
-        padding: 0,
+        marginVertical: '-1%',
         // backgroundColor: 'red',
         marginHorizontal: '10%',
         flexDirection: 'row',
+        alignItems: 'center',
         justifyContent: 'space-between',
         // marginHorizontal: 30,
     },
     line: {
-        height: '0.3%',
+        height: 1.5,
         backgroundColor: '#000000',
         width: '80%',
         alignSelf: 'center'
     },
     text1: {
-        fontSize: 19,
-        color: 'black',
-        marginHorizontal: '10%'
+        fontSize: 16,
+        color: textColors.tertiary,
+        marginHorizontal: '10%',
+        fontFamily: 'Lexend-Regular'
     },
+    profileContainer: {
+        backgroundColor: colors.secondary,
+        // marginHorizontal: '5%',
+        height: '65%',
+        width: '13%',
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: 40,
+        // alignSelf: 'flex-end'
+    },
+    personDataWrapper: {
+        elevation: 20,
+        borderRadius: 12,
+        paddingHorizontal: 10,
+        // borderColor: colors.,
+        // backgroundColor: '',
+        // borderWidth: 1.5,
+        marginHorizontal: '10%',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        width: '80%',
+        alignItems: 'center',
+        backgroundColor: colors.contrast,
+    },
+    iconContainer: {
+        // backgroundColor: 'orange',
+        marginLeft: '5%',
+        height: '50%',
+        width: '10%',
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
+    heading: {
+        color: textColors.secondary,
+        fontSize: 30,
+        fontFamily: 'Lexend-Regular',
+        marginLeft: '8%',
+    },
+    chipContainer: {
+        backgroundColor: colors.side,
+        borderColor: colors.secondary,
+        borderWidth: 1.5,
+
+        position: 'absolute',
+        top: '28%',
+        left: '8%',
+        // elevation: 20,
+        padding: '2%',
+        borderRadius: 5,
+    },
+    editIconContainer: {
+        backgroundColor: colors.side,
+        borderColor: colors.secondary,
+        borderWidth: 1.5,
+        position: 'absolute',
+        // top: '42.5%',
+        bottom: '-14%',
+        right: '20%',
+        // elevation: 20,
+        padding: '2%',
+        borderRadius: 5,
+    },
+    shareIconContainer: {
+        backgroundColor: colors.side,
+        borderColor: colors.secondary,
+        borderWidth: 1.5,
+        position: 'absolute',
+        // top: '42.5%',
+        bottom: '-14%',
+        right: '6%',
+        // elevation: 20,
+        padding: '2%',
+        borderRadius: 5,
+    },
+    chipText: {
+        fontFamily: 'Lexend-Regular',
+        fontSize: 18,
+        color: textColors.secondary,
+    },
+    aboutContainer: {
+        flexDirection: 'row',
+        // columnGap: 10,
+        gap: '150%',
+        // justifyContent: 'space-between',
+        // rowGap: 10,
+        backgroundColor: colors.contrast,
+        elevation: 5,
+        borderWidth: 1.5,
+        borderRadius: 5,
+        borderColor: colors.secondary,
+        marginHorizontal: '5%',
+        width: '90%',
+        alignSelf: 'center',
+        paddingTop: '10%',
+        paddingHorizontal: '3%',
+        paddingBottom: '3%'
+    },
+    bloodGroupContainer: {
+
+        margin: '1%',
+        width: '12%',
+        backgroundColor: colors.primary,
+        borderRadius: 3,
+        borderWidth: 1,
+        borderColor: colors.primary,
+        padding: '1.5%',
+        alignItems: 'center',
+        justifyContent: 'center',
+        alignSelf: 'flex-start'
+    },
+    bloodGroup: {
+        fontFamily: 'Lexend-Regular',
+        color: textColors.secondary,
+        fontSize: 13,
+    },
+    menuIconContainer: {
+        alignSelf: 'flex-end',
+        marginHorizontal: 30,
+        marginVertical: 10,
+        // backgroundColor: 'red',
+        height: '70%',
+        width: '50%', alignItems: 'center',
+        justifyContent: 'center'
+    },
+    buttonContainer1: {
+        backgroundColor: colors.primary,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 6,
+        flexDirection: 'row',
+        gap: '10%',
+        // borderWidth: 2,
+        // borderColor: '#FFFCFC',
+        alignSelf: 'center',
+        elevation: 2,
+        width: '47%',
+        padding: 14,
+        // paddingTop: 0,
+        // paddingBottom: 5,
+    },
+    buttonText: {
+        fontFamily: 'Lexend-Regular',
+        fontSize: 18,
+        color: textColors.secondary,
+        alignSelf: 'center',
+    }
 })

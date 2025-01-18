@@ -1,5 +1,5 @@
 import { ActivityIndicator, StyleSheet, Text, View, Image, Touchable, TouchableOpacity } from 'react-native'
-import React, { useCallback, useContext, useState } from 'react'
+import React, { useCallback, useContext, useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import LinearGradient from 'react-native-linear-gradient'
 import { TouchEventType } from 'react-native-gesture-handler/lib/typescript/web/interfaces'
@@ -10,57 +10,55 @@ import { useDispatch, useSelector } from 'react-redux'
 import { underDampedSpringCalculations } from 'react-native-reanimated/lib/typescript/animation/springUtils'
 import { Dialog, Portal } from 'react-native-paper'
 import Icon from 'react-native-vector-icons/Ionicons'
-import { ConnectivityContext } from '../../../components/BloofComponent/BloodConnection'
+import { ConnectivityContext } from '../../../Context/Connection'
 
 
 
 const BloodMenu = () => {
 
 
-    const isConnected = useContext(ConnectivityContext);
-
+    const { connected, checkNetwork, setOpen } = useContext(ConnectivityContext);
+      
     const navigation = useNavigation<any>()
-    const Email = useSelector((state: any) => state.blood.bloodMail)
-    const dispatch = useDispatch()
-    const [open, setOpen] = useState(false)
+    // const Email = useSelector((state: any) => state.blood.bloodMail)
+    // const dispatch = useDispatch()
 
 
 
-    if (isConnected == false) {
-        setOpen(true)
-    }
-    const getDataFromFirebase = () => {
-        console.log('Email at BloodMenu', Email)
-        try {
-            if (Email) {
-                const subscriber = firestore()
-                    .collection('BloodUsers')
-                    .where('email', '==', Email)
-                    .onSnapshot(documentSnapshot => {
-                        console.log('BloodApp Data  at BloodMenu ______________>:', documentSnapshot.docs)
-                        const threadsArray = documentSnapshot.docs.map(item => item.data())
-                        if (threadsArray) {
-                            console.log('userData is being Transferred to redux ', threadsArray)
-                            dispatch(addUser(threadsArray[0]))
-                        }
-                    })
 
-                return () => subscriber();
-            } else {
-                console.log('from Homescreen. There is no value in Email: ', Email)
-            }
 
-        } catch (error) {
-            console.log('Err fetching Email from redux-persist', error)
-        }
-    }
+    // const getDataFromFirebase = () => {
+    //     console.log('Email at BloodMenu', Email)
+    //     try {
+    //         if (Email) {
+    //             const subscriber = firestore()
+    //                 .collection('BloodUsers')
+    //                 .where('email', '==', Email)
+    //                 .onSnapshot(documentSnapshot => {
+    //                     console.log('BloodApp Data  at BloodMenu ______________>:', documentSnapshot.docs)
+    //                     const threadsArray = documentSnapshot.docs.map(item => item.data())
+    //                     if (threadsArray) {
+    //                         console.log('userData is being Transferred to redux ', threadsArray)
+    //                         dispatch(addUser(threadsArray[0]))
+    //                     }
+    //                 })
 
-    useFocusEffect(useCallback(
-        () => {
-            getDataFromFirebase()
-        },
-        [],
-    ))
+    //             return () => subscriber();
+    //         } else {
+    //             console.log('from Homescreen. There is no value in Email: ', Email)
+    //         }
+
+    //     } catch (error) {
+    //         console.log('Err fetching Email from redux-persist', error)
+    //     }
+    // }
+
+    // useFocusEffect(useCallback(
+    //     () => {
+    //         getDataFromFirebase()
+    //     },
+    //     [],
+    // ))
 
 
     return (
@@ -75,6 +73,7 @@ const BloodMenu = () => {
                         <Icon name='person-circle' size={50} color='grey' onPress={() => navigation.navigate('BloodProfile')} />
                     </View>
                     <View style={{ height: '2%' }} />
+
 
                     <TouchableOpacity
                         onPress={() => navigation.navigate('BloodHome')}

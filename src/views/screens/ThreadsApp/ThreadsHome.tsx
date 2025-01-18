@@ -46,8 +46,6 @@ const ThreadsHome = ({ route }: any) => {
             } catch (error) {
                 console.log('error fetching threads...', error)
             }
-
-
         },
         [],
     ))
