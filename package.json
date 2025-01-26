@@ -32,6 +32,7 @@
     "react-native-ico-social-media": "^5.1.2",
     "react-native-image-picker": "^7.2.3",
     "react-native-linear-gradient": "^2.8.3",
+    "react-native-maps": "^1.20.1",
     "react-native-onesignal": "^5.2.8",
     "react-native-paper": "^5.12.5",
     "react-native-radial-gradient": "^1.1.5",
