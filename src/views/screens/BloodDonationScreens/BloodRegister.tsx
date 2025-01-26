@@ -5,6 +5,7 @@ import LinearGradient from 'react-native-linear-gradient'
 import { CheckBox, Button as Button1 } from 'react-native-elements'
 import { useDispatch } from 'react-redux'
 import Auth from '@react-native-firebase/auth'
+import firebase from '@react-native-firebase/app'
 import { CommonActions, useFocusEffect, useNavigation } from '@react-navigation/native'
 import firestore from '@react-native-firebase/firestore'
 import { DefaultTheme, Dialog, Menu, Portal, Button } from 'react-native-paper'
@@ -21,12 +22,10 @@ import BloodInput from '../../../components/BloodComponent/BloodInput'
 
 
 const BloodRegister = () => {
-    const { connected, checkNetwork, setOpen } = useContext(ConnectivityContext);
-
-
-
+    const { connected, checkNetwork, setOpen, setUser } = useContext(ConnectivityContext);
 
     const dispatch = useDispatch()
+
     const bloodGroups = [
         { id: '1', name: 'O+' },
         { id: '2', name: 'O-' },
@@ -37,6 +36,7 @@ const BloodRegister = () => {
         { id: '7', name: 'AB+' },
         { id: '8', name: 'AB-' },
     ];
+
     const cities = [
         { id: '1', name: 'Lahore' },
         { id: '2', name: 'Rawalpindi' },
@@ -71,7 +71,7 @@ const BloodRegister = () => {
     ];
 
     const [OpenDialog, setOpenDialog] = useState(false);
-    const [error, setError] = useState('')
+    const [error, setError] = useState<any>('')
     const navigation = useNavigation<any>();
     const [gender, setGender] = useState<string>('');
     const [donor, setDonor] = useState(false);
@@ -151,11 +151,10 @@ const BloodRegister = () => {
     const createUserWithEmailAndPassword = async () => {
         setIsLoading(true)
 
-        if (!checkEmail(email)) {
+        if (!checkEmail(email.trim())) {
             // Alert.alert('Enter Correct Email!!');
             setError('Enter Correct Email!!')
             setOpenDialog(true)
-
             setIsLoading(false);
             return;
         } else {
@@ -163,62 +162,93 @@ const BloodRegister = () => {
             console.log('Email:', name);
             console.log('Password:', password);
             if (!email || !password || !name || !city || !gender || !bloodGroup) {
-                console.log('Email or Password or Name is empty');
+                console.log('PLease fill the required fiels ');
+                setError('PLease fill the required fields ')
                 setOpenDialog(true)
+
                 // Alert.alert('Email or Password is empty');
                 return setIsLoading(false);
             }
             else {
-                dispatch(addEmail(email))
-                Auth()
-                    .createUserWithEmailAndPassword(email, password)
-                    .then(() => {
-                        console.log('User Signed Up! sucessfully')
-                        firestore()
-                            .collection('BloodUsers')
-                            .add({
-                                name: name,
-                                // bio: bio,
-                                email: email,
-                                password: password,
-                                city: city,
-                                age: age,
-                                address: address,
-                                phone: phone,
-                                gender: gender,
-                                type: donor ? 'donor' : 'recepient',
-                                bloodGroup: bloodGroup,
-                                createdAt: new Date().toISOString()
-                            });
+                try {
+                    dispatch(addEmail(email))
+                    await Auth()
+                        .createUserWithEmailAndPassword(email, password)
+                        .then(() => {
+                            const user = firebase.auth().currentUser
 
-                        setIsLoading(false)
-                        navigation.dispatch(
-                            CommonActions.reset({
-                                index: 0,
-                                routes: [{ name: 'BloodProfile' }],
-                            })
-                        );
-                    })
-                    .catch((error) => {
-                        if (error.code == 'auth/email-already-in-use') {
-                            console.log('That email address is already in use!')
-                            // Alert.alert('That email address is already in use!')
-                        }
-                        if (error.code == 'auth/invalid-email') {
-                            console.log('That email address is invalid!!')
-                            // Alert.alert('That email address is invalid!!')
-                        }
-                        if (error.code == 'auth/operation-not-allowed') {
-                            console.log('The email is disabled by the owner of the app.')
-                            // Alert.alert('The email is disabled by the owner of the app.')
-                        }
-                        const err = `Pls check your Email:${error.code}: ${error.message}`
-                        setError(err)
-                        setOpenDialog(true)
-                        // setOpen(true)
-                        console.log(error)
+                            if (user) {
+                                console.log('User email: ', user.email);
+                            } else {
+                                console.log('No user Fetched')
+                            }
+                            user?.sendEmailVerification()
+                            console.log('User Signed Up! sucessfully')
+                            setUser(user)
+                            firestore()
+                                .collection('BloodUsers')
+                                .add({
+                                    name: name,
+                                    // bio: bio,
+                                    email: email,
+                                    password: password,
+                                    city: city,
+                                    age: age,
+                                    address: address,
+                                    phone: phone,
+                                    gender: gender,
+                                    type: donor ? 'donor' : 'recepient',
+                                    bloodGroup: bloodGroup,
+                                    createdAt: new Date().toISOString()
+                                });
+                            navigation.dispatch(
+                                CommonActions.reset({
+                                    index: 0,
+                                    routes: [{ name: 'BloodLogin' }],
+                                })
+                            );
+                            setIsLoading(false)
 
-                    })
+                        })
+                        .catch((error) => {
+                            if (error.code === 'auth/email-already-in-use') {
+                                console.error('That email address is already in use!');
+
+                                setIsLoading(false)
+                                setError(error.code)
+                                setOpenDialog(true)
+                                // Alert.alert('That email address is already in use!')
+                            }
+                            if (error.code == 'auth/invalid-email') {
+                                console.error('That email address is invalid!!')
+                                setIsLoading(false)
+                                setError(error.code)
+                                setOpenDialog(true)
+                                // Alert.alert('That email address is invalid!!')
+                            }
+                            if (error.code == 'auth/operation-not-allowed') {
+                                console.error('The email is disabled by the owner of the app.')
+                                setIsLoading(false)
+                                setError(error.code)
+                                setOpenDialog(true)
+                                // Alert.alert('The email is disabled by the owner of the app.')
+                            }
+                            const err = `Pls check your Email:${error.code}: ${error.message}`
+                            setIsLoading(false)
+                            setError(err)
+                            setOpenDialog(true)
+                            
+                            console.log(error)
+
+                        })
+                } catch (e) {
+
+                    setIsLoading(false)
+                    setError(e)
+                    setOpenDialog(true)
+                   
+                    console.log(e)
+                }
             }
         }
     }

@@ -82,6 +82,7 @@ import BloodHome from './views/screens/BloodDonationScreens/BloodHome.tsx'
 import { ConnectivityProvider } from './Context/Connection.tsx'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import BloodStart from './views/screens/BloodDonationScreens/BloodSplash.tsx'
+import BloodVerifyEmail from './views/screens/BloodDonationScreens/BloodVerifyEmail.tsx'
 
 
 
@@ -351,20 +352,19 @@ const App = () => {
    //    }
    // })
 
+
    const stack = createNativeStackNavigator({
       screens: {
-         // BloodHome: BloodHome,
-         // BloodSplashScreen: BloodSplashScreen,
          BloodStart: BloodStart,
+         BloodVerifyEmail: BloodVerifyEmail,
          BloodLogin: BloodLogin,
-         // BloodMenu: BloodMenu,
          BloodRegister: BloodRegister,
          BloodBankSearch: BloodBankSearch,
          BloodBankDonorsSearch: BloodBankDonorsSearch,
          BloodProfile: BloodProfile,
          BloodHome: BloodHome
-      },
 
+      },
       screenOptions: {
          headerShown: false,
       }
@@ -379,8 +379,8 @@ const App = () => {
             <Provider store={store}>
                <PersistGate loading={null} persistor={persistor}>
                   <PaperProvider  >
-                     {/* < PracticeScreen /> */}
                      <Navigation />
+                     {/* <PracticeScreen /> */}
                   </PaperProvider>
                </PersistGate>
             </Provider>

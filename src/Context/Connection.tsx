@@ -10,14 +10,17 @@ export const ConnectivityContext = createContext({
     connected: false,
     checkNetwork: () => { },
     open: false,
-    setOpen: (value: boolean) => { }
+    setOpen: (value: boolean) => { },
+    user: null,
+    setUser: (value: any) => { }
 });
+
 
 
 export const ConnectivityProvider = ({ children }: any) => {
 
     const [error, setError] = useState('')
-
+    const [user, setUser] = useState<any>()
 
     const [connected, setConnected] = useState<any>(false)
     const [open, setOpen] = useState(false)
@@ -69,6 +72,7 @@ export const ConnectivityProvider = ({ children }: any) => {
 
         })
         // const unsubscribe = NetInfo.addEventListener(state => {
+
         //     console.log("Connection type", state.type);
         //     console.log("Is connected?", state.isConnected);
         //     console.log("Details :?", state.details);
@@ -86,11 +90,14 @@ export const ConnectivityProvider = ({ children }: any) => {
         //     }
         // });
         // return unsubscribe();
+
+
+
     }
 
 
     return (
-        <ConnectivityContext.Provider value={{ connected, checkNetwork, open, setOpen }}>
+        <ConnectivityContext.Provider value={{ connected, checkNetwork, open, setOpen, user, setUser }}>
             {children}
             <SafeAreaView>
                 <Snackbar

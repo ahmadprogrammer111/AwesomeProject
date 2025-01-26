@@ -1,27 +1,45 @@
 
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import { Button, StyleSheet, Text, View } from 'react-native'
+import React, { createContext, useContext, useEffect, useRef, useState } from 'react'
+import { arrayRemove } from '@react-native-firebase/firestore';
 
 
 const PracticeScreen = () => {
 
 
- 
+  const [data, setData] = useState<any>()
 
-//   const users = [
-//     { name: 'John', age: 25 },
-//     { name: 'Alice', age: 17 },
-//     { name: 'Bob', age: 22 }
-//   ];
+  const users = [
+    { id: 1, name: "Alice", age: 25, gender: "female" },
+    { id: 2, name: "Bob", age: 30, gender: "male" },
+    { id: 3, name: "Charlie", age: 35, gender: "male" },
+    { id: 4, name: "Diana", age: 28, gender: "female" },
+  ];
 
-//   const newArray = users.filter((item) => item.age > 18).map((item)=> item.name)
 
-//   console.log(newArray)
-//   return (
-//     <View style={styles.container}>
+  return (
+    <View style={styles.container}>
+      <View style={{ height: '20%' }} />
+      <Button title='refresh' color="#841584" />
+      <View style={{ height: '6%' }} />
+      {/* {data?.map((item: any, index: number) => {
 
-//     </View>
-//   )
+        let uitem = ({ ...item, key: index })
+        console.log(uitem)
+        return ( */}
+      <View style={{ alignSelf: 'center' }}>
+        <Text style={{ color: '#fff', fontFamily: 'Lexend-Bold', fontSize: 30 }}>
+          { } has  body
+        </Text>
+      </View>
+      {/* )
+      })
+      } */}
+    </View>
+  )
+
+
+
 }
 
 
@@ -31,7 +49,8 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: 'black',
     flex: 1,
-  }
+  },
+
 })
 
 

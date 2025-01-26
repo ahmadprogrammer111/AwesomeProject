@@ -8,13 +8,13 @@ import { CommonActions, useFocusEffect, useNavigation } from '@react-navigation/
 import { useNetInfo } from '@react-native-community/netinfo'
 import { addEventListener } from "@react-native-community/netinfo";
 import { Snackbar } from 'react-native-paper'
-import { getAuth } from '@react-native-firebase/auth'
+import { firebase, getAuth } from '@react-native-firebase/auth'
 import { ConnectivityContext } from '../../../Context/Connection'
 
 
 const BloodStart = () => {
 
-    const { connected, checkNetwork, open, setOpen } = useContext(ConnectivityContext);
+    const { connected, checkNetwork, open, setOpen, setUser } = useContext(ConnectivityContext);
 
 
 
@@ -33,38 +33,56 @@ const BloodStart = () => {
 
 
     const [initializing, setInitializing] = useState(true);
-    const [user, setUser] = useState();
+    const [user1, setUser1] = useState<any>();
 
     // const [connected, setConnected] = useState<boolean | undefined>(false)
     // const [open, setOpen] = useState(false)
 
     function onAuthStateChanged(user: any) {
-        setUser(user);
         console.log('User Found', user)
+        console.log('User Email Verified-->:', user?.emailVerified)
+
+        firebase?.auth().currentUser?.reload().then(() => console.log('reloading User Data???'))
+
+
+
+        setUser(user);
+        setUser1(user);
+
+
         if (initializing) setInitializing(false);
         // console.log(initializing)
     }
 
 
     useEffect(() => {
-        const subscriber = getAuth().onAuthStateChanged(onAuthStateChanged);
-        return subscriber;
-    }, [initializing]);
-
+        if (connected == true) {
+            const subscriber = getAuth().onAuthStateChanged(onAuthStateChanged)
+            return subscriber;
+        }
+    });
 
 
     useFocusEffect(useCallback(
         () => {
             if (!initializing && connected) {
                 setTimeout(() => {
-                    if (user) {
+                    if (user1?.emailVerified == true) {
                         navigation.dispatch(
                             CommonActions.reset({
                                 index: 0,
                                 routes: [{ name: 'BloodProfile' }],
                             })
                         );
-                    } else {
+                    } else if (user1?.emailVerified == false) {
+                        navigation.dispatch(
+                            CommonActions.reset({
+                                index: 0,
+                                routes: [{ name: 'BloodVerifyEmail' }],
+                            })
+                        );
+                    }
+                    else {
                         navigation.dispatch(
                             CommonActions.reset({
                                 index: 0,
