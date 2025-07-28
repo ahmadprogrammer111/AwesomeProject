@@ -1,6 +1,6 @@
 package com.awesomeproject
 
-import com.surajit.rnrg.RNRadialGradientPackage;
+import com.surajit.rnrg.RNRadialGradientPackage
 import android.app.Application
 import com.facebook.react.PackageList
 import com.facebook.react.ReactApplication
@@ -24,10 +24,6 @@ class MainApplication : Application(), ReactApplication {
 
         override fun getJSMainModuleName(): String = "index"
 
-          override fun getJSBundleFile(): String? {
-          return "http://allowed-artistic-stallion.ngrok-free.app/index.bundle?platform=android&dev=true&minify=false"
-      }
-
         override fun getUseDeveloperSupport(): Boolean = BuildConfig.DEBUG
 
         override val isNewArchEnabled: Boolean = BuildConfig.IS_NEW_ARCHITECTURE_ENABLED
@@ -41,7 +37,6 @@ class MainApplication : Application(), ReactApplication {
     super.onCreate()
     SoLoader.init(this, false)
     if (BuildConfig.IS_NEW_ARCHITECTURE_ENABLED) {
-      // If you opted-in for the New Architecture, we load the native entry point for this app.
       load()
     }
   }
