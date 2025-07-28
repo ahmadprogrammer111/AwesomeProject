@@ -24,6 +24,10 @@ class MainApplication : Application(), ReactApplication {
 
         override fun getJSMainModuleName(): String = "index"
 
+          override fun getJSBundleFile(): String? {
+          return "http://d743728146b9.ngrok-free.app/index.bundle?platform=android&dev=true&minify=false"
+      }
+
         override fun getUseDeveloperSupport(): Boolean = BuildConfig.DEBUG
 
         override val isNewArchEnabled: Boolean = BuildConfig.IS_NEW_ARCHITECTURE_ENABLED
