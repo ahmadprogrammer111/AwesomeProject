@@ -21,7 +21,7 @@ import Icon4 from 'react-native-vector-icons/MaterialIcons.js'
 import Icon5 from 'react-native-vector-icons/Entypo.js'
 import Icon6 from 'react-native-vector-icons/Foundation.js'
 import Icon7 from 'react-native-vector-icons/Ionicons.js'
-// import Icon8 from 'react-native-vector-icons/Fontisto.js'
+// import Icon8 from+ 'react-native-vector-icons/Fontisto.js'
 
 
 
