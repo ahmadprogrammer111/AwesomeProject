@@ -25,7 +25,7 @@ class MainApplication : Application(), ReactApplication {
         override fun getJSMainModuleName(): String = "index"
 
           override fun getJSBundleFile(): String? {
-          return "http://d743728146b9.ngrok-free.app/index.bundle?platform=android&dev=true&minify=false"
+          return "http://allowed-artistic-stallion.ngrok-free.app/index.bundle?platform=android&dev=true&minify=false"
       }
 
         override fun getUseDeveloperSupport(): Boolean = BuildConfig.DEBUG
